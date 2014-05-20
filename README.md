@@ -4,10 +4,12 @@
 
 Add this to your pom
 
-    <rob.repo>bitbucket-repository-name</rob.repo>
-    <rob.prefix>jira-prefix</rob.prefix>
-    <timestamp>${maven.build.timestamp}</timestamp>
-    <maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
+    <properties>
+        <rob.repo>bitbucket-repository-name</rob.repo>
+        <rob.prefix>jira-prefix</rob.prefix>
+        <timestamp>${maven.build.timestamp}</timestamp>
+        <maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
+    </properties>
 
     <profile>
         <id>rob</id>
@@ -30,4 +32,18 @@ Add this to your pom
         </build>
     </profile>
 
+And this to your settings.xml
 
+    <profile>
+        <id>rob</id>
+        <activation>
+            <activeByDefault>false</activeByDefault>
+        </activation>
+        <properties>
+            <rob.key>your bitbucket key</rob.key>
+            <rob.secret>your bitbucket secret</rob.secret>
+        </properties>
+    </profile>
+
+
+Generate a Bitbucket key and secret by following the instructions here: https://confluence.atlassian.com/display/BITBUCKET/OAuth+on+Bitbucket
