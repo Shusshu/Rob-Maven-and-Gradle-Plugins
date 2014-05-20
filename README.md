@@ -18,10 +18,10 @@ Add this to your pom
                 <plugin>
                     <groupId>be.billington</groupId>
                     <artifactId>rob-maven-plugin</artifactId>
-                    <version>1.0.0</version>
+                    <version>1.0.1</version>
                     <executions>
                         <execution>
-                            <phase>initialize</phase>
+                            <phase>generate-resources</phase>
                             <goals>
                                 <goal>rob</goal>
                             </goals>
