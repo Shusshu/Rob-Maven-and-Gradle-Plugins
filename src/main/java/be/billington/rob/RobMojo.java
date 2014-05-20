@@ -47,7 +47,7 @@ public class RobMojo extends AbstractMojo
     @Parameter(property = "rob.branch", defaultValue = "development")
     private String branch;
 
-    @Parameter(property = "rob.file", defaultValue = "./changelog.txt")
+    @Parameter(property = "rob.file", defaultValue = "changelog.txt")
     private String filePath;
 
     @Parameter(property = "rob.key", required = true)
@@ -210,6 +210,7 @@ public class RobMojo extends AbstractMojo
 
         try {
             File file = new File(targetDirectory, filePath );
+            file.createNewFile();
             buffer.writeTo(new FileOutputStream( file ));
 
             getLog().info("Report: " + file.getPath());
