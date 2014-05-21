@@ -1,14 +1,16 @@
 #Rob
 
-##Usage
+## Goal
+
+Rob's goal is to generate change log reports for your project by using bitbucket or github commits log by following a set of rules to generate the report.
+
+## Usage
 
 Add this to your pom
 
     <properties>
         <rob.repo>bitbucket-repository-name</rob.repo>
         <rob.prefix>jira-prefix</rob.prefix>
-        <timestamp>${maven.build.timestamp}</timestamp>
-        <maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
     </properties>
 
     <profile>
@@ -18,12 +20,12 @@ Add this to your pom
                 <plugin>
                     <groupId>be.billington</groupId>
                     <artifactId>rob-maven-plugin</artifactId>
-                    <version>1.0.1</version>
+                    <version>1.1.0</version>
                     <executions>
                         <execution>
                             <phase>generate-resources</phase>
                             <goals>
-                                <goal>rob</goal>
+                                <goal>logs</goal>
                             </goals>
                         </execution>
                     </executions>
