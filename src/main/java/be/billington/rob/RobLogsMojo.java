@@ -8,9 +8,12 @@ import okio.Buffer;
 import okio.ByteString;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
+import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -29,8 +32,8 @@ import java.util.List;
  * Rob logger
  *
  */
-@Mojo( name = "rob")
-public class RobMojo extends AbstractMojo
+@Mojo( name = "logs", requiresProject = false)
+public class RobLogsMojo extends AbstractMojo
 {
     @Parameter(property = "rob.repo", required = true)
     private String repository;
@@ -50,7 +53,7 @@ public class RobMojo extends AbstractMojo
     @Parameter(property = "rob.branch", defaultValue = "development")
     private String branch;
 
-    @Parameter(property = "rob.file", defaultValue = "changelog.txt")
+    @Parameter(property = "rob.file", defaultValue = "./changelog.txt")
     private String filePath;
 
     @Parameter(property = "rob.key", required = true)
@@ -65,8 +68,11 @@ public class RobMojo extends AbstractMojo
     @Parameter(readonly = true, defaultValue = "${project.build.directory}")
     protected File targetDirectory;
 
-    @Parameter(readonly = true, defaultValue = "${timestamp}")
-    private String currentTime;
+    /**
+     * @since 1.1.0
+     */
+    @Component
+    private SecDispatcher securityDispatcher;
 
     private List<String> commitMessages = new LinkedList<>();
     private List<String> jiraMessages = new LinkedList<>();
@@ -179,7 +185,7 @@ public class RobMojo extends AbstractMojo
             endDate = LocalDate.parse(endDateStr, DateTimeFormatter.ISO_LOCAL_DATE);
 
         } else {
-            endDate = LocalDate.parse(currentTime, DateTimeFormatter.ISO_LOCAL_DATE);
+            endDate = LocalDate.now();
         }
 
         if (startDateStr != null && startDateStr.length() > 0) {
@@ -212,7 +218,13 @@ public class RobMojo extends AbstractMojo
         writeToFile(buffer, "\n\nUncategorised messages:\n", otherMessages);
 
         try {
-            File file = new File(targetDirectory, filePath );
+            File file;
+            if (targetDirectory != null && targetDirectory.exists()){
+                file = new File(targetDirectory, filePath );
+            } else {
+                file = new File( filePath );
+            }
+
             file.createNewFile();
             buffer.writeTo(new FileOutputStream( file ));
 
@@ -229,6 +241,16 @@ public class RobMojo extends AbstractMojo
             for (String msg : content){
                 buffer.writeUtf8("- " + msg + "\n");
             }
+        }
+    }
+
+    protected String decrypt(String encoded) throws MojoExecutionException {
+        try {
+            return securityDispatcher.decrypt( encoded );
+
+        } catch ( SecDispatcherException e ) {
+            getLog().error( "error using security dispatcher: " + e.getMessage(), e );
+            throw new MojoExecutionException( "error using security dispatcher: " + e.getMessage(), e );
         }
     }
 }
