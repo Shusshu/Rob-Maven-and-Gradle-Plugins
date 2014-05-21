@@ -74,6 +74,8 @@ public class RobMojo extends AbstractMojo
 
     private LocalDate startDate, endDate;
 
+    private static final String OWNER = "afrogleap";
+
     public void execute() throws MojoExecutionException
     {
         getLog().info( "Robbing..." );
@@ -89,13 +91,13 @@ public class RobMojo extends AbstractMojo
             //oAuthConsumer.setTokenWithSecret(token, secret);
 
             RestAdapter restAdapter = new RestAdapter.Builder()
-                    .setEndpoint("https://bitbucket.org")
+                    .setEndpoint(Bitbucket.URL)
                     .setClient(new SigningOkClient(oAuthConsumer))
                     .build();
 
             Bitbucket bitbucket = restAdapter.create(Bitbucket.class);
 
-            BitbucketResponse resp = bitbucket.listCommits( repository, branch );
+            BitbucketResponse resp = bitbucket.listCommits( OWNER, repository, branch );
 
             getLog().info( "Neighborhood with " + resp.getPagelen() + " houses (Pages)." );
 
@@ -151,7 +153,7 @@ public class RobMojo extends AbstractMojo
                 }
                 if (readNextPage && resp.getNext() != null && !resp.getNext().isEmpty()) {
                     getLog().info("A few more houses to go.");
-                    resp = bitbucket.listCommits(repository, branch, resp.getPage() + 1);
+                    resp = bitbucket.listCommits(OWNER, repository, branch, resp.getPage() + 1);
 
                 } else {
                     getLog().info("Last one for today.");

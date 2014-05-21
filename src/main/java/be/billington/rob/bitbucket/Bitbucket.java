@@ -6,10 +6,12 @@ import retrofit.http.Query;
 
 public interface Bitbucket {
 
-    @GET("/api/2.0/repositories/afrogleap/{repo}/commits/{branch}")
-    BitbucketResponse listCommits( @Path("repo") String repo, @Path("branch") String branch);
+    String URL = "https://bitbucket.org";
 
-    @GET("/api/2.0/repositories/afrogleap/{repo}/commits/{branch}")
-    BitbucketResponse listCommits( @Path("repo") String repo, @Path("branch") String branch, @Query("page") int page);
+    @GET("/api/2.0/repositories/{owner}/{repo}/commits/{branch}")
+    BitbucketResponse listCommits( @Path("owner") String owner, @Path("repo") String repo, @Path("branch") String branch);
+
+    @GET("/api/2.0/repositories/{owner}/{repo}/commits/{branch}")
+    BitbucketResponse listCommits( @Path("owner") String owner, @Path("repo") String repo, @Path("branch") String branch, @Query("page") int page);
 
 }
