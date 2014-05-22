@@ -33,6 +33,9 @@ public class Section {
     }
 
     public boolean excludeCommit(String message) {
+        if (excludes == null){
+            return false;
+        }
         for (String exclude : excludes) {
             if (message.toLowerCase().contains(exclude)) {
                 return true;

@@ -128,6 +128,9 @@ public class RobLogsMojo extends AbstractMojo
                         String[] commitMsgList = commit.getMessage().split("\n");
 
                         configSections.getSections().forEach( (section) -> {
+                            if (section.excludeCommit(commit.getMessage())) {
+                                return ;
+                            }
                             if (commit.getMessage().toLowerCase().contains(section.getMatch().toLowerCase())) {
                                 commitListMap.get(section.getTitle()).add(commitMsgList[0]);
                             }
