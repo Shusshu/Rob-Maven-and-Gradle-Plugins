@@ -4,19 +4,20 @@ package be.billington.rob;
 import be.billington.rob.bitbucket.Bitbucket;
 import be.billington.rob.bitbucket.BitbucketResponse;
 import be.billington.rob.bitbucket.Commit;
+import com.google.gson.Gson;
 import okio.Buffer;
-import okio.ByteString;
+import okio.BufferedSource;
+import okio.Okio;
+import okio.Source;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
-import retrofit.client.Response;
 import se.akerfeldt.signpost.retrofit.RetrofitHttpOAuthConsumer;
 import se.akerfeldt.signpost.retrofit.SigningOkClient;
 
@@ -24,9 +25,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Rob logger
@@ -35,11 +36,16 @@ import java.util.List;
 @Mojo( name = "logs", requiresProject = false)
 public class RobLogsMojo extends AbstractMojo
 {
+    private static final String DEFAULT_RULES = "default_rules.json";
+
     @Parameter(property = "rob.repo", required = true)
     private String repository;
 
     @Parameter(property = "rob.prefix", required = true)
     private String prefix;
+
+    @Parameter(property = "rob.rules")
+    private String rulesFile;
 
     @Parameter(property = "rob.from.date")
     private String startDateStr;
@@ -74,12 +80,7 @@ public class RobLogsMojo extends AbstractMojo
     @Component
     private SecDispatcher securityDispatcher;
 
-    private List<String> commitMessages = new LinkedList<>();
-    private List<String> jiraMessages = new LinkedList<>();
-    private List<String> crashlyticsMessages = new LinkedList<>();
-    private List<String> otherMessages = new LinkedList<>();
-    private List<String> bitbucketMessages = new LinkedList<>();
-    private List<String> sonarMessages = new LinkedList<>();
+    private Map<String, List<String>> commitListMap = new LinkedHashMap<>();
 
     private LocalDate startDate, endDate;
 
@@ -94,6 +95,16 @@ public class RobLogsMojo extends AbstractMojo
 
         //Process
         try {
+            ConfigSections configSections = prepareConfig();
+            //Prepare map
+            for (Section section : configSections.getSections()){
+                commitListMap.put(section.getTitle(), new ArrayList<>());
+            }
+            for (Section section : configSections.getExclusiveSections()){
+                commitListMap.put(section.getTitle(), new ArrayList<>());
+            }
+
+
             RetrofitHttpOAuthConsumer oAuthConsumer = new RetrofitHttpOAuthConsumer(key, secret);
             //oAuthConsumer.setTokenWithSecret(token, secret);
 
@@ -127,29 +138,26 @@ public class RobLogsMojo extends AbstractMojo
 
                         String[] commitMsgList = commit.getMessage().split("\n");
 
-                        commitMessages.add(commitMsgList[0]);
+                        //TODO can this be run in parallel since we have the commitListMap ?
+                        LocalTime timeA = LocalTime.now();
+                        configSections.getSections().forEach( (section) -> {
+                            if (commit.getMessage().toLowerCase().contains(section.getMatch().toLowerCase())) {
+                                commitListMap.get(section.getTitle()).add(commitMsgList[0]);
+                            }
+                        });
+                        LocalTime timeB = LocalTime.now();
+                        long diff = timeB.toNanoOfDay() - timeA.toNanoOfDay();
+                        getLog().debug( "Time parallel " + diff + " ms" );
 
-                        if (commit.getMessage().toLowerCase().contains(this.prefix)) {
-                            jiraMessages.add(commitMsgList[0]);
-                        }
-                        if (commit.getMessage().toLowerCase().contains("crash #")) {
-                            crashlyticsMessages.add(commitMsgList[0]);
-                        }
-                        if (commit.getMessage().toLowerCase().contains("issue #")) {
-                            bitbucketMessages.add(commitMsgList[0]);
-                        }
-                        if (commit.getMessage().toLowerCase().contains("sonar")) {
-                            sonarMessages.add(commitMsgList[0]);
-                        }
 
-                        if (!commit.getMessage().toLowerCase().contains("crash #")
-                                && !commit.getMessage().toLowerCase().contains(this.prefix)
-                                && !commit.getMessage().toLowerCase().contains("issue #")
-                                && !commit.getMessage().toLowerCase().contains("sonar")
-                                && !commit.getMessage().toLowerCase().contains("merge remote-tracking branch")
-                                && !commit.getMessage().toLowerCase().contains("merge branch")) {
-
-                            otherMessages.add(commitMsgList[0]);
+                        for (Section exclusiveSection : configSections.getExclusiveSections()) {
+                            if (configSections.hasMatchInSections(commit.getMessage())) {
+                                continue;
+                            }
+                            if (exclusiveSection.excludeCommit(commit.getMessage())) {
+                                continue;
+                            }
+                            commitListMap.get(exclusiveSection.getTitle()).add(commitMsgList[0]);
                         }
 
                     } else if (commitDate.isBefore(this.endDate) ) {
@@ -171,14 +179,34 @@ public class RobLogsMojo extends AbstractMojo
 
             getLog().info("Time is up. It is no longer safe to rob houses.");
 
-        } catch (RetrofitError e) {
-            getLog().error( "Error: " + e.getMessage() + " - " + e.getResponse().getStatus(), e);
-        }
 
-        generateFile();
+            generateFile(configSections);
+
+        } catch (RetrofitError e) {
+            getLog().error( "Network Error: " + e.getMessage() + " - " + e.getResponse().getStatus(), e);
+
+        } catch (IOException ioex) {
+            getLog().error( "File Error: " + ioex.getMessage(), ioex);
+        }
 
         getLog().info( "Robbed." );
     }
+
+    private ConfigSections prepareConfig() throws IOException {
+        Gson gson = new Gson();
+        Source source;
+        if (rulesFile == null){
+            source = Okio.source(getClass().getResourceAsStream(DEFAULT_RULES));
+        } else {
+            source = Okio.source(new File( rulesFile ));
+        }
+        BufferedSource configRulesFileJson = Okio.buffer(source);
+        ConfigSections configSections = gson.fromJson(configRulesFileJson.readUtf8(), ConfigSections.class);
+        //TODO improve filtering via maven
+        configSections.filtering(this.prefix);
+        return configSections;
+    }
+
 
     private boolean initDateParams() {
         if (endDateStr != null && endDateStr.length() > 0) {
@@ -201,21 +229,14 @@ public class RobLogsMojo extends AbstractMojo
         return true;
     }
 
-    private void generateFile() {
+    private void generateFile(ConfigSections configSections) {
         getLog().info("Counting how much stuff I have robbed today. (Generate file)");
 
         Buffer buffer = new Buffer();
         buffer.writeUtf8("Changelog from " + this.startDate + " until " + this.endDate + "\n");
 
-        writeToFile(buffer, "\nJira Tickets:\n", jiraMessages);
 
-        writeToFile(buffer, "\n\nCrash fixes from Crashlytics:\n", crashlyticsMessages);
-
-        writeToFile(buffer, "\n\nBitbucket Tickets:\n", bitbucketMessages);
-
-        writeToFile(buffer, "\n\nCode quality improvement (Sonar):\n", sonarMessages);
-
-        writeToFile(buffer, "\n\nUncategorised messages:\n", otherMessages);
+        commitListMap.forEach( (title, commits) -> writeToFile(buffer, title, commits) );
 
         try {
             File file;
