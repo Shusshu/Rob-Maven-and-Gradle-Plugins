@@ -4,11 +4,7 @@ package be.billington.rob;
 import be.billington.rob.bitbucket.Bitbucket;
 import be.billington.rob.bitbucket.BitbucketResponse;
 import be.billington.rob.bitbucket.Commit;
-import com.google.gson.Gson;
 import okio.Buffer;
-import okio.BufferedSource;
-import okio.Okio;
-import okio.Source;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
@@ -166,8 +162,7 @@ public class RobLogsMojo extends AbstractMojo
 
             getLog().info("Time is up. It is no longer safe to rob houses.");
 
-
-            generateFile(configSections);
+            generateFile();
 
         } catch (RetrofitError e) {
             getLog().error( "Network Error: " + e.getMessage() + " - " + e.getResponse().getStatus(), e);
@@ -200,7 +195,7 @@ public class RobLogsMojo extends AbstractMojo
         return true;
     }
 
-    private void generateFile(ConfigSections configSections) {
+    private void generateFile() {
         getLog().info("Counting how much stuff I have robbed today. (Generate file)");
 
         Buffer buffer = new Buffer();
