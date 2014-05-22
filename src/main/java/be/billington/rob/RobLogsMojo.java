@@ -35,7 +35,6 @@ import java.util.*;
 @Mojo( name = "logs", requiresProject = false)
 public class RobLogsMojo extends AbstractMojo
 {
-    private static final String DEFAULT_RULES = "default_rules.json";
 
     @Parameter(property = "rob.repo", required = true)
     private String repository;
@@ -92,18 +91,13 @@ public class RobLogsMojo extends AbstractMojo
             return ;
         }
 
-        //Process
         try {
-            ConfigSections configSections = prepareConfig();
-            //Prepare map
-            for (Section section : configSections.getSections()){
-                commitListMap.put(section.getTitle(), new ArrayList<>());
-            }
-            for (Section section : configSections.getExclusiveSections()){
-                commitListMap.put(section.getTitle(), new ArrayList<>());
-            }
+            //Init
+            ConfigSections configSections = ConfigSections.createConfigSections(rulesFile, this.prefix);
 
+            configSections.initMap(commitListMap);
 
+            //Process
             RetrofitHttpOAuthConsumer oAuthConsumer = new RetrofitHttpOAuthConsumer(key, secret);
             //oAuthConsumer.setTokenWithSecret(token, secret);
 
@@ -184,22 +178,6 @@ public class RobLogsMojo extends AbstractMojo
 
         getLog().info( "Robbed." );
     }
-
-    private ConfigSections prepareConfig() throws IOException {
-        Gson gson = new Gson();
-        Source source;
-        if (rulesFile == null){
-            source = Okio.source(getClass().getResourceAsStream(DEFAULT_RULES));
-        } else {
-            source = Okio.source(new File( rulesFile ));
-        }
-        BufferedSource configRulesFileJson = Okio.buffer(source);
-        ConfigSections configSections = gson.fromJson(configRulesFileJson.readUtf8(), ConfigSections.class);
-        //TODO improve filtering via maven
-        configSections.filtering(this.prefix);
-        return configSections;
-    }
-
 
     private boolean initDateParams() {
         if (endDateStr != null && endDateStr.length() > 0) {
