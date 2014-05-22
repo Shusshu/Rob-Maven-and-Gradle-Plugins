@@ -25,7 +25,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -138,17 +137,11 @@ public class RobLogsMojo extends AbstractMojo
 
                         String[] commitMsgList = commit.getMessage().split("\n");
 
-                        //TODO can this be run in parallel since we have the commitListMap ?
-                        LocalTime timeA = LocalTime.now();
                         configSections.getSections().forEach( (section) -> {
                             if (commit.getMessage().toLowerCase().contains(section.getMatch().toLowerCase())) {
                                 commitListMap.get(section.getTitle()).add(commitMsgList[0]);
                             }
                         });
-                        LocalTime timeB = LocalTime.now();
-                        long diff = timeB.toNanoOfDay() - timeA.toNanoOfDay();
-                        getLog().debug( "Time parallel " + diff + " ms" );
-
 
                         for (Section exclusiveSection : configSections.getExclusiveSections()) {
                             if (configSections.hasMatchInSections(commit.getMessage())) {
