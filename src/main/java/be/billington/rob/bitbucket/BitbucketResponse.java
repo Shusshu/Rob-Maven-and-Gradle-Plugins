@@ -5,7 +5,7 @@ import java.util.List;
 public class BitbucketResponse {
 
     private int pagelen;
-    private List<Commit> values;
+    private List<BitbucketCommit> values;
     private int page;
     private String next;
 
@@ -33,11 +33,11 @@ public class BitbucketResponse {
         this.pagelen = pagelen;
     }
 
-    public List<Commit> getValues() {
+    public List<BitbucketCommit> getValues() {
         return values;
     }
 
-    public void setValues(List<Commit> values) {
+    public void setValues(List<BitbucketCommit> values) {
         this.values = values;
     }
 }

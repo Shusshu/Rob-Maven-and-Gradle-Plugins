@@ -3,7 +3,11 @@ package be.billington.rob;
 
 import be.billington.rob.bitbucket.Bitbucket;
 import be.billington.rob.bitbucket.BitbucketResponse;
-import be.billington.rob.bitbucket.Commit;
+import be.billington.rob.bitbucket.BitbucketCommit;
+import be.billington.rob.bitbucket.RobLogBitbucketManager;
+import be.billington.rob.github.Github;
+import be.billington.rob.github.GithubCommit;
+import be.billington.rob.github.RobLogGithubManager;
 import okio.Buffer;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -37,6 +41,9 @@ public class RobLogsMojo extends AbstractMojo
 
     @Parameter(property = "rob.prefix", required = true)
     private String prefix;
+
+    @Parameter(property = "rob.api", required = true, defaultValue = "bitbucket")
+    private String api;
 
     @Parameter(property = "rob.rules")
     private String rulesFile;
@@ -93,12 +100,20 @@ public class RobLogsMojo extends AbstractMojo
 
             configSections.initMap(commitListMap);
 
-            fetchAndProcessCommitMessages(configSections);
+            RobLogManager manager;
+            if (api.equals("bitbucket")) {
+                manager = new RobLogBitbucketManager(commitListMap, getLog(), key, secret, owner, repository, branch, startDate, endDate);
+            } else {
+                manager = new RobLogGithubManager(commitListMap, getLog(), key, secret, owner, repository, branch, startDate, endDate);
+            }
+
+            manager.fetchAndProcessCommitMessages(configSections);
 
             generateFile();
 
         } catch (RetrofitError e) {
-            getLog().error( "Network Error: " + e.getMessage() + " - " + e.getResponse().getStatus(), e);
+
+            getLog().error( "Network Error: " + e.getMessage() + " - " + e.getResponse().getStatus() + " - URL: " + e.getUrl(), e);
 
         } catch (IOException ioex) {
             getLog().error( "File Error: " + ioex.getMessage(), ioex);

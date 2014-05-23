@@ -1,6 +1,8 @@
 package be.billington.rob.bitbucket;
 
-public class Commit {
+import be.billington.rob.Commit;
+
+public class BitbucketCommit implements Commit {
 
     private String date;
     private String message;
