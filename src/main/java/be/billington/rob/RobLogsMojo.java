@@ -93,77 +93,7 @@ public class RobLogsMojo extends AbstractMojo
 
             configSections.initMap(commitListMap);
 
-            //Process
-            RetrofitHttpOAuthConsumer oAuthConsumer = new RetrofitHttpOAuthConsumer(key, secret);
-            //oAuthConsumer.setTokenWithSecret(token, secret);
-
-            RestAdapter restAdapter = new RestAdapter.Builder()
-                    .setEndpoint(Bitbucket.URL)
-                    .setClient(new SigningOkClient(oAuthConsumer))
-                    .build();
-
-            Bitbucket bitbucket = restAdapter.create(Bitbucket.class);
-
-            BitbucketResponse resp = bitbucket.listCommits( owner, repository, branch );
-
-            getLog().info( "Neighborhood with " + resp.getPagelen() + " houses (Pages)." );
-
-            LocalDate commitDate;
-            boolean readNextPage = true;
-
-            do {
-                getLog().info("Walking around house number: " + resp.getPage() + " (Page)");
-
-                for (Commit commit : resp.getValues()) {
-
-                    commitDate = LocalDate.parse(commit.getDate(), DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-                    if (commitDate.isAfter(this.startDate) &&
-                            (commitDate.isBefore(this.endDate) || commitDate.isEqual(this.endDate)) ) {
-
-                        if (commit.getMessage().charAt(0) == '!') {
-                            getLog().info("Electrified fences on this side, skipping it (!)");
-                            continue;
-                        }
-
-                        String[] commitMsgList = commit.getMessage().split("\n");
-
-                        configSections.getSections().forEach( (section) -> {
-                            if (section.excludeCommit(commit.getMessage())) {
-                                return ;
-                            }
-                            if (commit.getMessage().toLowerCase().contains(section.getMatch().toLowerCase())) {
-                                commitListMap.get(section.getTitle()).add(commitMsgList[0]);
-                            }
-                        });
-
-                        for (Section exclusiveSection : configSections.getExclusiveSections()) {
-                            if (configSections.hasMatchInSections(commit.getMessage())) {
-                                continue;
-                            }
-                            if (exclusiveSection.excludeCommit(commit.getMessage())) {
-                                continue;
-                            }
-                            commitListMap.get(exclusiveSection.getTitle()).add(commitMsgList[0]);
-                        }
-
-                    } else if (commitDate.isBefore(this.endDate) ) {
-                        readNextPage = false;
-                        getLog().info("Shit, cops on the lookout.");
-                        break;
-                    }
-                }
-                if (readNextPage && resp.getNext() != null && !resp.getNext().isEmpty()) {
-                    getLog().info("A few more houses to go.");
-                    resp = bitbucket.listCommits(owner, repository, branch, resp.getPage() + 1);
-
-                } else {
-                    getLog().info("Last one for today.");
-                    readNextPage = false;
-                }
-
-            } while (readNextPage);
-
-            getLog().info("Time is up. It is no longer safe to rob houses.");
+            fetchAndProcessCommitMessages(configSections);
 
             generateFile();
 
@@ -175,6 +105,80 @@ public class RobLogsMojo extends AbstractMojo
         }
 
         getLog().info( "Robbed." );
+    }
+
+    private void fetchAndProcessCommitMessages(ConfigSections configSections) {
+        //Process
+        RetrofitHttpOAuthConsumer oAuthConsumer = new RetrofitHttpOAuthConsumer(key, secret);
+        //oAuthConsumer.setTokenWithSecret(token, secret);
+
+        RestAdapter restAdapter = new RestAdapter.Builder()
+                .setEndpoint(Bitbucket.URL)
+                .setClient(new SigningOkClient(oAuthConsumer))
+                .build();
+
+        Bitbucket bitbucket = restAdapter.create(Bitbucket.class);
+
+        BitbucketResponse resp = bitbucket.listCommits( owner, repository, branch );
+
+        getLog().info( "Neighborhood with " + resp.getPagelen() + " houses (Pages)." );
+
+        LocalDate commitDate;
+        boolean readNextPage = true;
+
+        do {
+            getLog().info("Walking around house number: " + resp.getPage() + " (Page)");
+
+            for (Commit commit : resp.getValues()) {
+
+                commitDate = LocalDate.parse(commit.getDate(), DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+                if (commitDate.isAfter(this.startDate) &&
+                        (commitDate.isBefore(this.endDate) || commitDate.isEqual(this.endDate)) ) {
+
+                    if (commit.getMessage().charAt(0) == '!') {
+                        getLog().info("Electrified fences on this side, skipping it (!)");
+                        continue;
+                    }
+
+                    String[] commitMsgList = commit.getMessage().split("\n");
+
+                    configSections.getSections().forEach( (section) -> {
+                        if (section.excludeCommit(commit.getMessage())) {
+                            return ;
+                        }
+                        if (commit.getMessage().toLowerCase().contains(section.getMatch().toLowerCase())) {
+                            commitListMap.get(section.getTitle()).add(commitMsgList[0]);
+                        }
+                    });
+
+                    for (Section exclusiveSection : configSections.getExclusiveSections()) {
+                        if (configSections.hasMatchInSections(commit.getMessage())) {
+                            continue;
+                        }
+                        if (exclusiveSection.excludeCommit(commit.getMessage())) {
+                            continue;
+                        }
+                        commitListMap.get(exclusiveSection.getTitle()).add(commitMsgList[0]);
+                    }
+
+                } else if (commitDate.isBefore(this.endDate) ) {
+                    readNextPage = false;
+                    getLog().info("Shit, cops on the lookout.");
+                    break;
+                }
+            }
+            if (readNextPage && resp.getNext() != null && !resp.getNext().isEmpty()) {
+                getLog().info("A few more houses to go.");
+                resp = bitbucket.listCommits(owner, repository, branch, resp.getPage() + 1);
+
+            } else {
+                getLog().info("Last one for today.");
+                readNextPage = false;
+            }
+
+        } while (readNextPage);
+
+        getLog().info("Time is up. It is no longer safe to rob houses.");
     }
 
     private boolean initDateParams() {
