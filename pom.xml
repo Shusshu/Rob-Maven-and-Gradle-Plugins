@@ -62,6 +62,13 @@
 
     </dependencies>
 
+    <repositories>
+        <repository>
+            <id>com.afrogleap.repo.afl.group</id>
+            <url>http://nxs.pm.afrogleap.com/nexus/content/groups/afl</url>
+        </repository>
+    </repositories>
+
     <build>
         <plugins>
             <plugin>

@@ -1,6 +1,7 @@
 package be.billington.rob.github;
 
 import be.billington.rob.Commit;
+import be.billington.rob.ConfigSections;
 import be.billington.rob.RobLogManager;
 import org.apache.maven.plugin.logging.Log;
 import retrofit.RestAdapter;
@@ -8,23 +9,18 @@ import retrofit.RestAdapter;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
 
 public class RobLogGithubManager extends RobLogManager {
 
-    private final String key;
-    private final String secret;
+    private final String token;
     private final String owner;
     private final String repository;
-    private final String branch;
 
-    public RobLogGithubManager(Map<String, List<String>> commitListMap, Log log, String key, String secret, String owner, String repository, String branch, LocalDate startDate, LocalDate endDate) {
-        super(commitListMap, log, startDate, endDate);
-        this.key = key;
-        this.secret = secret;
+    public RobLogGithubManager(Log log, ConfigSections config, String token, String owner, String repository, LocalDate startDate, LocalDate endDate) {
+        super(log, config, startDate, endDate);
+        this.token = token;
         this.owner = owner;
         this.repository = repository;
-        this.branch = branch;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package be.billington.rob.bitbucket;
 
 import be.billington.rob.Commit;
+import be.billington.rob.ConfigSections;
 import be.billington.rob.RobLogManager;
 import org.apache.maven.plugin.logging.Log;
 import retrofit.RestAdapter;
@@ -9,7 +10,6 @@ import se.akerfeldt.signpost.retrofit.SigningOkClient;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 public class RobLogBitbucketManager extends RobLogManager {
 
@@ -21,8 +21,8 @@ public class RobLogBitbucketManager extends RobLogManager {
 
     private BitbucketResponse resp;
 
-    public RobLogBitbucketManager(Map<String, List<String>> commitListMap, Log log, String key, String secret, String owner, String repository, String branch, LocalDate startDate, LocalDate endDate) {
-        super(commitListMap, log, startDate, endDate);
+    public RobLogBitbucketManager(Log log, ConfigSections config, String key, String secret, String owner, String repository, String branch, LocalDate startDate, LocalDate endDate) {
+        super(log, config, startDate, endDate);
         this.key = key;
         this.secret = secret;
         this.owner = owner;
@@ -32,7 +32,6 @@ public class RobLogBitbucketManager extends RobLogManager {
 
     @Override
     protected List<? extends Commit> fetchFromApi(int page){
-        //Process
         RetrofitHttpOAuthConsumer oAuthConsumer = new RetrofitHttpOAuthConsumer(key, secret);
         //oAuthConsumer.setTokenWithSecret(token, secret);
 

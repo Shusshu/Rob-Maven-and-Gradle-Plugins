@@ -8,9 +8,7 @@ import okio.Source;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class ConfigSections {
 
@@ -53,9 +51,6 @@ public class ConfigSections {
         this.exclusiveSections = exclusiveSections;
     }
 
-    public void addSectionMatch(String message){
-        //TODO
-    }
 
     public boolean hasMatchInSections(String message){
         for (Section section : getSections()) {
@@ -74,12 +69,4 @@ public class ConfigSections {
         });
     }
 
-    public void initMap(Map<String, List<String>> commitListMap) {
-        for (Section section : getSections()){
-            commitListMap.put(section.getTitle(), new ArrayList<>());
-        }
-        for (Section section : getExclusiveSections()){
-            commitListMap.put(section.getTitle(), new ArrayList<>());
-        }
-    }
 }
