@@ -33,7 +33,7 @@ public class RobLogGithubManager extends RobLogManager {
 
         List<GithubCommit> commits = github.listCommits(owner, repository,
                 this.startDate.format(DateTimeFormatter.ISO_LOCAL_DATE),
-                this.endDate.format(DateTimeFormatter.ISO_LOCAL_DATE));
+                this.endDate.format(DateTimeFormatter.ISO_LOCAL_DATE), "Bearer " + token);
 
         return commits;
     }
