@@ -3,10 +3,7 @@ package be.billington.rob;
 
 import be.billington.rob.bitbucket.Bitbucket;
 import be.billington.rob.bitbucket.BitbucketResponse;
-import be.billington.rob.bitbucket.BitbucketCommit;
 import be.billington.rob.bitbucket.RobLogBitbucketManager;
-import be.billington.rob.github.Github;
-import be.billington.rob.github.GithubCommit;
 import be.billington.rob.github.RobLogGithubManager;
 import okio.Buffer;
 import org.apache.maven.plugin.AbstractMojo;
@@ -26,7 +23,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Rob logger

@@ -1,19 +1,11 @@
 package be.billington.rob;
 
-import be.billington.rob.bitbucket.Bitbucket;
-import be.billington.rob.bitbucket.BitbucketResponse;
-import be.billington.rob.github.Github;
-import be.billington.rob.github.GithubCommit;
-import retrofit.RestAdapter;
-import se.akerfeldt.signpost.retrofit.RetrofitHttpOAuthConsumer;
-import se.akerfeldt.signpost.retrofit.SigningOkClient;
+import org.apache.maven.plugin.logging.Log;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.maven.plugin.logging.Log;
 
 public abstract class RobLogManager {
 

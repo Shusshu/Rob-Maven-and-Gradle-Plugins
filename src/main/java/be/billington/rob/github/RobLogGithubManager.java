@@ -4,8 +4,6 @@ import be.billington.rob.Commit;
 import be.billington.rob.RobLogManager;
 import org.apache.maven.plugin.logging.Log;
 import retrofit.RestAdapter;
-import se.akerfeldt.signpost.retrofit.RetrofitHttpOAuthConsumer;
-import se.akerfeldt.signpost.retrofit.SigningOkClient;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -36,9 +34,6 @@ public class RobLogGithubManager extends RobLogManager {
                 .build();
 
         Github github = restAdapter.create(Github.class);
-
-        getLog().info( "Date: " + this.startDate.format(DateTimeFormatter.ISO_LOCAL_DATE));
-        getLog().info( "Date: " + this.endDate.format(DateTimeFormatter.ISO_LOCAL_DATE));
 
         List<GithubCommit> commits = github.listCommits(owner, repository,
                 this.startDate.format(DateTimeFormatter.ISO_LOCAL_DATE),

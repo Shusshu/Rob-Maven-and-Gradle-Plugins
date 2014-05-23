@@ -1,20 +1,13 @@
 package be.billington.rob.bitbucket;
 
 import be.billington.rob.Commit;
-import be.billington.rob.ConfigSections;
 import be.billington.rob.RobLogManager;
-import be.billington.rob.Section;
-import be.billington.rob.bitbucket.Bitbucket;
-import be.billington.rob.bitbucket.BitbucketResponse;
-import be.billington.rob.github.Github;
-import be.billington.rob.github.GithubCommit;
 import org.apache.maven.plugin.logging.Log;
 import retrofit.RestAdapter;
 import se.akerfeldt.signpost.retrofit.RetrofitHttpOAuthConsumer;
 import se.akerfeldt.signpost.retrofit.SigningOkClient;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
