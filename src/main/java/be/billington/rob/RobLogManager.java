@@ -48,14 +48,13 @@ public abstract class RobLogManager {
     protected abstract boolean hasNextPage();
 
     public void fetchAndProcessCommitMessages() {
-        int page = 0;
+        int page = 1;
         List<? extends Commit> commits = fetchFromApi(page);
 
         LocalDate commitDate;
         boolean readNextPage = true;
 
         do {
-            page++;
             getLog().info("Walking around house number: " + page + " (Page)");
 
             for (Commit commit : commits) {
@@ -98,7 +97,13 @@ public abstract class RobLogManager {
             }
             if (readNextPage && hasNextPage()) {
                 getLog().info("A few more houses to go.");
+                page++;
                 commits = fetchFromApi(page);
+
+                if (commits == null || commits.isEmpty()) {
+                    readNextPage = false;
+                    getLog().info("Not enough room in the bag. Gotta stop");
+                }
 
             } else {
                 getLog().info("Last one for today.");

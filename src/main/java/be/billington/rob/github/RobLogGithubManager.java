@@ -30,17 +30,26 @@ public class RobLogGithubManager extends RobLogManager {
                 .build();
 
         Github github = restAdapter.create(Github.class);
+        List<GithubCommit> commits;
 
-        List<GithubCommit> commits = github.listCommits(owner, repository,
-                this.startDate.format(DateTimeFormatter.ISO_LOCAL_DATE),
-                this.endDate.format(DateTimeFormatter.ISO_LOCAL_DATE), "Bearer " + token);
+        getLog().info("page " +page);
+
+        if (page == 0) {
+            commits = github.listCommits(owner, repository,
+                    this.startDate.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                    this.endDate.format(DateTimeFormatter.ISO_LOCAL_DATE), "Bearer " + token);
+        } else {
+            commits = github.listCommits(owner, repository, page,
+                    this.startDate.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                    this.endDate.format(DateTimeFormatter.ISO_LOCAL_DATE), "Bearer " + token);
+        }
 
         return commits;
     }
 
     @Override
     protected boolean hasNextPage() {
-        return false;
+        return true;
     }
 
 }

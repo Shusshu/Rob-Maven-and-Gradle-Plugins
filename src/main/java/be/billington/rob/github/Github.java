@@ -15,6 +15,18 @@ public interface Github {
     List<GithubCommit> listCommits(@Path("owner") String owner, @Path("repo") String repo, @Header("Authorization") String token);
 
     @GET("/repos/{owner}/{repo}/commits")
-    List<GithubCommit> listCommits(@Path("owner") String owner, @Path("repo") String repo, @Query("since") String since, @Query("until") String until,  @Header("Authorization") String token);
+    List<GithubCommit> listCommits(@Path("owner") String owner,
+                                   @Path("repo") String repo,
+                                   @Query("since") String since,
+                                   @Query("until") String until,
+                                   @Header("Authorization") String token);
+
+    @GET("/repos/{owner}/{repo}/commits")
+    List<GithubCommit> listCommits(@Path("owner") String owner,
+                                   @Path("repo") String repo,
+                                   @Query("page") int page,
+                                   @Query("since") String since,
+                                   @Query("until") String until,
+                                   @Header("Authorization") String token);
 
 }
