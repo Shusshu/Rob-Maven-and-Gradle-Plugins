@@ -62,6 +62,9 @@ public class ConfigSections {
     }
 
     public void filtering(String prefix) {
+        if (prefix == null || prefix.isEmpty()) {
+            return ;
+        }
         getSections().parallelStream().forEach((section) -> {
             if (section.getMatch().contains("${rob.prefix}")) {
                 section.setMatch(prefix);

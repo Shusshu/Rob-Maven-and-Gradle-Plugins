@@ -28,11 +28,14 @@ public class RobLogsMojo extends AbstractMojo
     @Parameter(property = "rob.repo", required = true)
     private String repository;
 
-    @Parameter(property = "rob.prefix", required = true)
-    private String prefix;
-
     @Parameter(property = "rob.api", required = true, defaultValue = "bitbucket")
     private String api;
+
+    @Parameter(property = "rob.owner", required = true, defaultValue = "afrogleap")
+    private String owner;
+
+    @Parameter(property = "rob.prefix")
+    private String prefix;
 
     @Parameter(property = "rob.rules")
     private String rulesFile;
@@ -42,9 +45,6 @@ public class RobLogsMojo extends AbstractMojo
 
     @Parameter(property = "rob.to.date")
     private String endDateStr;
-
-    @Parameter(property = "rob.owner", defaultValue = "afrogleap")
-    private String owner;
 
     @Parameter(property = "rob.branch", defaultValue = "development")
     private String branch;

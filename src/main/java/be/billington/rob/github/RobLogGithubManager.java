@@ -32,16 +32,20 @@ public class RobLogGithubManager extends RobLogManager {
         Github github = restAdapter.create(Github.class);
         List<GithubCommit> commits;
 
-        getLog().info("page " +page);
+        String auth = "";
+
+        if (token != null && !token.isEmpty()) {
+            auth = "Bearer " + token;
+        }
 
         if (page == 0) {
             commits = github.listCommits(owner, repository,
                     this.startDate.format(DateTimeFormatter.ISO_LOCAL_DATE),
-                    this.endDate.format(DateTimeFormatter.ISO_LOCAL_DATE), "Bearer " + token);
+                    this.endDate.format(DateTimeFormatter.ISO_LOCAL_DATE), auth);
         } else {
             commits = github.listCommits(owner, repository, page,
                     this.startDate.format(DateTimeFormatter.ISO_LOCAL_DATE),
-                    this.endDate.format(DateTimeFormatter.ISO_LOCAL_DATE), "Bearer " + token);
+                    this.endDate.format(DateTimeFormatter.ISO_LOCAL_DATE), auth);
         }
 
         return commits;
