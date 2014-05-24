@@ -64,6 +64,12 @@
             <groupId>se.akerfeldt</groupId>
             <artifactId>signpost-retrofit</artifactId>
             <version>0.0.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.squareup.retrofit</groupId>
+                    <artifactId>retrofit</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
