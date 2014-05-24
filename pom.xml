@@ -4,16 +4,34 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>9</version>
+    </parent>
+
     <groupId>be.billington</groupId>
     <artifactId>rob-maven-plugin</artifactId>
     <version>2.3.0</version>
 
     <packaging>maven-plugin</packaging>
 
+    <name>Rob Maven Plugin</name>
+    <url>http://www.github.com/Shusshu/Rob-Maven-Plugin</url>
+    <description>Maven Plugin to generate change log reports based on Github or Bitbucket's commit history</description>
+    <developers>
+        <developer>
+            <id>bbi-user</id>
+            <name>Benoit Billington</name>
+            <email>benoit.billington@gmail.com</email>
+        </developer>
+    </developers>
+
     <properties>
         <maven.version>3.0.5</maven.version>
         <mavenPluginPluginVersion>3.3</mavenPluginPluginVersion>
         <java.version>1.8</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencies>
@@ -57,7 +75,7 @@
         <dependency>
             <groupId>com.squareup.okio</groupId>
             <artifactId>okio</artifactId>
-            <version>0.9.0</version>
+            <version>1.0.0</version>
         </dependency>
 
     </dependencies>
@@ -107,4 +125,27 @@
             </plugin>
         </plugins>
     </build>
+
+    <prerequisites>
+        <maven>3.0.5</maven>
+    </prerequisites>
+
+    <scm>
+        <connection>scm:git:git@github.com:Shusshu/Rob-Maven-Plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:Shusshu/Rob-Maven-Plugin.git</developerConnection>
+        <url>https://github.com/Shusshu/Rob-Maven-Plugin</url>
+    </scm>
+
+    <issueManagement>
+        <system>github</system>
+        <url>https://github.com/Shusshu/Rob-Maven-Plugin</url>
+    </issueManagement>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 </project>
