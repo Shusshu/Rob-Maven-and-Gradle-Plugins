@@ -8,20 +8,20 @@ import org.gradle.api.tasks.StopExecutionException
 
 import be.billington.rob.bitbucket.RobLogBitbucketManager
 import be.billington.rob.github.RobLogGithubManager
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
 
 class RobGradle implements Plugin<Project> {
     void apply(Project project) {
-
+        Logger slf4jLogger = LoggerFactory.getLogger('some-logger')
         //StaticLoggerBinder.getSingleton().getLoggerFactory().getLogger("")
         if (true) {
-            manager = new RobLogBitbucketManager(log, config, key, secret, owner, repository, branch, startDate, endDate);
+            manager = new RobLogBitbucketManager(slf4jLogger, config, key, secret, owner, repository, branch, startDate, endDate);
         } else {
-            manager = new RobLogGithubManager(log, config, token, owner, repository, startDate, endDate);
+            manager = new RobLogGithubManager(slf4jLogger, config, token, owner, repository, startDate, endDate);
         }
 
-        project.extensions.create("greeting", GreetingPluginExtension)
-        project.task('hello') << {
-            println "${project.greeting.message} from ${project.greeting.greeter}"
-        }
+
     }
 }
