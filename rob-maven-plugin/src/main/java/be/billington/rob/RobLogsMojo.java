@@ -8,6 +8,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.slf4j.impl.StaticLoggerBinder;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 import retrofit.RetrofitError;
@@ -77,6 +78,8 @@ public class RobLogsMojo extends AbstractMojo
 
     public void execute() throws MojoExecutionException
     {
+        StaticLoggerBinder.getSingleton().setMavenLog(this.getLog());
+
         getLog().info( "Robbing..." );
 
         if (!initDateParams()) {
@@ -89,9 +92,9 @@ public class RobLogsMojo extends AbstractMojo
 
             RobLogManager manager;
             if (api.equals("bitbucket")) {
-                manager = new RobLogBitbucketManager(getLog(), config, key, secret, owner, repository, branch, startDate, endDate);
+                manager = new RobLogBitbucketManager(StaticLoggerBinder.getSingleton().getLoggerFactory().getLogger(""), config, key, secret, owner, repository, branch, startDate, endDate);
             } else {
-                manager = new RobLogGithubManager(getLog(), config, token, owner, repository, startDate, endDate);
+                manager = new RobLogGithubManager(StaticLoggerBinder.getSingleton().getLoggerFactory().getLogger(""), config, token, owner, repository, startDate, endDate);
             }
 
             manager.fetchAndProcessCommitMessages();

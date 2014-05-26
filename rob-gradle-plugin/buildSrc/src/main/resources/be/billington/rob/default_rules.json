@@ -1,0 +1,29 @@
+{
+    "sections": [
+        {
+            "title": "\nJira Tickets:\n",
+            "match": "${rob.prefix}"
+        },
+        {
+            "title": "\n\nCrash fixes from Crashlytics:\n",
+            "match": "crash #"
+        },
+        {
+            "title": "\n\nBitbucket Tickets:\n",
+            "match": "issue #"
+        },
+        {
+            "title": "\n\nCode quality improvement (Sonar):\n",
+            "match": "sonar"
+        }
+    ],
+    "exclusive_sections": [
+        {
+            "title": "\n\nUncategorised messages:\n",
+            "excludes": [
+                "merge remote-tracking branch",
+                "merge branch"
+            ]
+        }
+    ]
+}

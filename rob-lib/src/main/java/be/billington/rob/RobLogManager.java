@@ -1,7 +1,7 @@
 package be.billington.rob;
 
 import okio.Buffer;
-import org.apache.maven.plugin.logging.Log;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -18,10 +18,10 @@ public abstract class RobLogManager {
     protected final LocalDate startDate;
     protected final LocalDate endDate;
     private ConfigSections config;
-    private Log log;
+    private Logger log;
     private Map<String, List<String>> commitListMap;
 
-    public RobLogManager(Log log, ConfigSections config, LocalDate startDate, LocalDate endDate) {
+    public RobLogManager(Logger log, ConfigSections config, LocalDate startDate, LocalDate endDate) {
         this.commitListMap = new LinkedHashMap<>();
         this.log = log;
         this.config = config;
@@ -39,7 +39,7 @@ public abstract class RobLogManager {
         }
     }
 
-    public Log getLog(){
+    public Logger getLog(){
         return this.log;
     }
 

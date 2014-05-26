@@ -1,0 +1,77 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.2'
+    }
+}
+
+apply plugin: 'groovy'
+apply plugin: 'maven'
+apply plugin: 'nexus'
+
+dependencies {
+    repositories {
+        mavenLocal()
+
+        mavenCentral()
+        maven {
+            url "http://nxs.pm.afrogleap.com/nexus/content/groups/afl"
+            credentials {
+                username = mavenAflUser
+                password = mavenAflPassword
+            }
+        }
+    }
+
+    compile 'be.billington.rob:rob-lib:3.0.0'
+    compile gradleApi()
+    compile localGroovy()
+
+}
+
+group = 'be.billington.rob'
+version = '3.0.0'
+
+
+install {
+    repositories.mavenInstaller {
+        pom.artifactId = 'rob-gradle-plugin'
+    }
+}
+uploadArchives {
+    repositories.mavenDeployer {
+        pom.artifactId = 'rob-gradle-plugin'
+    }
+}
+
+modifyPom {
+    project {
+        name 'Rob Plugin'
+        description 'Gradle plugin which Rob logs'
+        url 'https://github.com/Shusshu/rob-maven-and-gradle-plugins'
+        inceptionYear '2014'
+
+        scm {
+            url 'https://github.com/Shusshu/rob-maven-and-gradle-plugins'
+            connection 'scm:git:git://github.com/Shusshu/rob-maven-and-gradle-plugins.git'
+            developerConnection 'scm:git:ssh://git@github.com/Shusshu/rob-maven-and-gradle-plugins.git'
+        }
+
+        licenses {
+            license {
+                name 'The Apache Software License, Version 2.0'
+                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                distribution 'repo'
+            }
+        }
+
+        developers {
+            developer {
+                id 'bbi'
+                name 'Benoit Billington'
+            }
+        }
+    }
+}

@@ -1,0 +1,30 @@
+buildscript {
+  repositories {
+    mavenLocal()
+    mavenCentral()
+  }
+  dependencies {
+	classpath 'be.billington.rob:rob-gradle-plugin:3.0.0'
+    //classpath fileTree(dir: 'libs', include: ['*.jar'])
+  }
+}
+
+apply plugin: 'rob-plugin'
+
+
+dependencies {
+    repositories {
+        mavenLocal()
+
+        mavenCentral()
+        maven {
+            url "http://nxs.pm.afrogleap.com/nexus/content/groups/afl"
+            credentials {
+                username = mavenAflUser
+                password = mavenAflPassword
+            }
+        }
+    }
+
+
+}

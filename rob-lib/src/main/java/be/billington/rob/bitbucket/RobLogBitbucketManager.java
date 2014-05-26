@@ -3,7 +3,7 @@ package be.billington.rob.bitbucket;
 import be.billington.rob.Commit;
 import be.billington.rob.ConfigSections;
 import be.billington.rob.RobLogManager;
-import org.apache.maven.plugin.logging.Log;
+import org.slf4j.Logger;
 import retrofit.RestAdapter;
 import se.akerfeldt.signpost.retrofit.RetrofitHttpOAuthConsumer;
 import se.akerfeldt.signpost.retrofit.SigningOkClient;
@@ -21,7 +21,7 @@ public class RobLogBitbucketManager extends RobLogManager {
 
     private BitbucketResponse resp;
 
-    public RobLogBitbucketManager(Log log, ConfigSections config, String key, String secret, String owner, String repository, String branch, LocalDate startDate, LocalDate endDate) {
+    public RobLogBitbucketManager(Logger log, ConfigSections config, String key, String secret, String owner, String repository, String branch, LocalDate startDate, LocalDate endDate) {
         super(log, config, startDate, endDate);
         this.key = key;
         this.secret = secret;

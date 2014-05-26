@@ -10,11 +10,11 @@
         <version>9</version>
     </parent>
 
-    <groupId>be.billington</groupId>
-    <artifactId>rob-maven-plugin</artifactId>
-    <version>2.3.0</version>
+    <groupId>be.billington.rob</groupId>
+    <artifactId>rob-parent</artifactId>
+    <version>3.0.0</version>
 
-    <packaging>maven-plugin</packaging>
+    <packaging>pom</packaging>
 
     <name>Rob Maven Plugin</name>
     <url>http://www.github.com/Shusshu/Rob-Maven-Plugin</url>
@@ -34,58 +34,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.maven.plugin-tools</groupId>
-            <artifactId>maven-plugin-annotations</artifactId>
-            <version>${mavenPluginPluginVersion}</version>
-            <scope>provided</scope>
-        </dependency>
-        <!-- Maven -->
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-plugin-api</artifactId>
-            <version>${maven.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.sonatype.plexus</groupId>
-            <artifactId>plexus-sec-dispatcher</artifactId>
-            <version>1.4</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.squareup.retrofit</groupId>
-            <artifactId>retrofit</artifactId>
-            <version>1.5.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>se.akerfeldt</groupId>
-            <artifactId>signpost-retrofit</artifactId>
-            <version>0.0.1</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.squareup.retrofit</groupId>
-                    <artifactId>retrofit</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>com.squareup.okhttp</groupId>
-            <artifactId>okhttp</artifactId>
-            <version>1.5.4</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.squareup.okio</groupId>
-            <artifactId>okio</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-
-    </dependencies>
-
     <repositories>
         <repository>
             <id>com.afrogleap.repo.afl.group</id>
@@ -94,44 +42,36 @@
     </repositories>
 
     <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-plugin-plugin</artifactId>
-                <version>${mavenPluginPluginVersion}</version>
-                <configuration>
-                    <goalPrefix>rob</goalPrefix>
-                    <!-- see http://jira.codehaus.org/browse/MNG-5346 -->
-                    <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>mojo-descriptor</id>
-                        <goals>
-                            <goal>descriptor</goal>
-                        </goals>
-                    </execution>
-                    <!-- if you want to generate help goal -->
-                    <execution>
-                        <id>help-goal</id>
-                        <goals>
-                            <goal>helpmojo</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.1</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-plugin-plugin</artifactId>
+					<version>${mavenPluginPluginVersion}</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
     </build>
 
+	
+	<profiles>
+		<profile>
+			<id>standard</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<modules>
+				<module>rob-lib</module>
+                <module>rob-maven-plugin</module>
+			</modules>
+		</profile>
+	</profiles>
+	
     <prerequisites>
         <maven>3.0.5</maven>
     </prerequisites>
