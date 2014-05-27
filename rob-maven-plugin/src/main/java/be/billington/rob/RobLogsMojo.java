@@ -1,7 +1,9 @@
 package be.billington.rob;
 
 
+import be.billington.rob.bitbucket.BitbucketCredentials;
 import be.billington.rob.bitbucket.RobLogBitbucketManager;
+import be.billington.rob.github.GithubCredentials;
 import be.billington.rob.github.RobLogGithubManager;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -29,7 +31,7 @@ public class RobLogsMojo extends AbstractMojo
     @Parameter(property = "rob.repo", required = true)
     private String repository;
 
-    @Parameter(property = "rob.api", required = true, defaultValue = "bitbucket")
+    @Parameter(property = "rob.api", required = true, defaultValue = "Bitbucket")
     private String api;
 
     @Parameter(property = "rob.owner", required = true, defaultValue = "afrogleap")
@@ -74,63 +76,26 @@ public class RobLogsMojo extends AbstractMojo
     @Component
     private SecDispatcher securityDispatcher;
 
-    private LocalDate startDate, endDate;
-
     public void execute() throws MojoExecutionException
     {
         StaticLoggerBinder.getSingleton().setMavenLog(this.getLog());
 
         getLog().info( "Robbing..." );
 
-        if (!initDateParams()) {
-            getLog().info( "Couldn't rob anything." );
-            return ;
-        }
-
         try {
-            ConfigSections config = ConfigSections.createConfigSections(rulesFile, this.prefix);
-
-            RobLogManager manager;
-            if (api.equals("bitbucket")) {
-                manager = new RobLogBitbucketManager(StaticLoggerBinder.getSingleton().getLoggerFactory().getLogger(""), config, key, secret, owner, repository, branch, startDate, endDate);
+            Credentials credentials;
+            if (api.toLowerCase().equals(Rob.API_BITBUCKET)){
+                credentials = new BitbucketCredentials(key, secret);
             } else {
-                manager = new RobLogGithubManager(StaticLoggerBinder.getSingleton().getLoggerFactory().getLogger(""), config, token, owner, repository, startDate, endDate);
+                credentials = new GithubCredentials(token);
             }
+            Rob.logs(StaticLoggerBinder.getSingleton().getLoggerFactory().getLogger(""), api, owner, repository, prefix, branch, rulesFile, filePath, startDateStr, endDateStr, credentials);
 
-            manager.fetchAndProcessCommitMessages();
-
-            manager.generateFile(targetDirectory, filePath);
-
-        } catch (RetrofitError e) {
-
-            getLog().error( "Network Error: " + e.getMessage() + " - " + e.getResponse().getStatus() + " - URL: " + e.getUrl(), e);
-
-        } catch (IOException ioex) {
-            getLog().error( "File Error: " + ioex.getMessage(), ioex);
+        } catch (Exception e) {
+            getLog().error( "Error: " + e.getMessage(), e);
         }
 
         getLog().info( "Robbed." );
-    }
-
-    private boolean initDateParams() {
-        if (endDateStr != null && endDateStr.length() > 0) {
-            endDate = LocalDate.parse(endDateStr, DateTimeFormatter.ISO_LOCAL_DATE);
-
-        } else {
-            endDate = LocalDate.now();
-        }
-
-        if (startDateStr != null && startDateStr.length() > 0) {
-            startDate = LocalDate.parse(startDateStr, DateTimeFormatter.ISO_LOCAL_DATE);
-        } else {
-            startDate = endDate.minusDays(14l);
-        }
-
-        if (startDate.isAfter(endDate)){
-            getLog().error("'From date' must be before 'to date'");
-            return false;
-        }
-        return true;
     }
 
     protected String decrypt(String encoded) throws MojoExecutionException {

@@ -3,13 +3,13 @@ package be.billington.rob
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
+import be.billington.rob.bitbucket.BitbucketCredentials
 import be.billington.rob.bitbucket.RobLogBitbucketManager
+import be.billington.rob.github.GithubCredentials
 import be.billington.rob.github.RobLogGithubManager
 import be.billington.rob.RobLogManager
+import be.billington.rob.Credentials
 import be.billington.rob.ConfigSections
-
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 
 class RobGradle implements Plugin<Project> {
@@ -34,34 +34,33 @@ class RobGradle implements Plugin<Project> {
             api = project.robApi
         }
 
-        def endDate = LocalDate.now()
+        def endDateStr = ""
         if ( project.hasProperty('robToDate') ) {
-            endDate = LocalDate.parse(project.robToDate, DateTimeFormatter.ISO_LOCAL_DATE)
+            endDate = project.robToDate
         }
-        def startDate = endDate.minusDays(14)
+        def startDateStr = ""
         if ( project.hasProperty('robFromDate') ) {
-            startDate = LocalDate.parse(project.robFromDate, DateTimeFormatter.ISO_LOCAL_DATE)
-        }
-
-        if (startDate.isAfter(endDate)){
-            throw new IllegalArgumentException("'From date' must be before 'to date'")
+            startDateStr = project.robFromDate
         }
 
         //TODO pass also the custom config file
 
-        ConfigSections config = ConfigSections.createConfigSections(null, prefix)
+        project.logger.info( "Robbing..." );
 
-        RobLogManager manager
-        if (api.equals("bitbucket")) {
-            manager = new RobLogBitbucketManager(project.logger, config, project.bitbucketKey, project.bitbucketSecret, project.robOwner, project.robRepository, branch, startDate, endDate)
-        } else {
-            manager = new RobLogGithubManager(project.logger, config, project.githubToken, project.robOwner, project.robRepository, startDate, endDate)
+        try {
+            Credentials credentials;
+            if (api.toLowerCase().equals(Rob.API_BITBUCKET)){
+                credentials = new BitbucketCredentials(project.bitbucketKey, project.bitbucketSecret);
+            } else {
+                credentials = new GithubCredentials(project.githubToken);
+            }
+            Rob.logs(project.logger, api, project.robOwner, project.robRepository, prefix, branch, "", project.robFile, startDateStr, endDateStr, credentials);
+
+        } catch (Exception e) {
+            project.logger.error( "Error: " + e.getMessage(), e);
         }
 
-        manager.fetchAndProcessCommitMessages()
-
-        manager.generateFile(null, project.robFile)
-
+        project.logger.info( "Robbed." );
     }
 
 }

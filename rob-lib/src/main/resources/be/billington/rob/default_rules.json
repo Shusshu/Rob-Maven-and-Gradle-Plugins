@@ -9,7 +9,7 @@
             "match": "crash #"
         },
         {
-            "title": "\n\nBitbucket Tickets:\n",
+            "title": "\n\${rob.api} Tickets:\n",
             "match": "issue #"
         },
         {

@@ -14,10 +14,10 @@ public class ConfigSections {
 
     private static final String DEFAULT_RULES = "default_rules.json";
 
-    public static ConfigSections createConfigSections(String rulesFilePath, String prefix) throws IOException {
+    public static ConfigSections createConfigSections(String rulesFilePath, String prefix, String api) throws IOException {
         Gson gson = new Gson();
         Source source;
-        if (rulesFilePath == null){
+        if (rulesFilePath == null || rulesFilePath.length() == 0) {
             source = Okio.source(ConfigSections.class.getResourceAsStream(DEFAULT_RULES));
         } else {
             source = Okio.source(new File( rulesFilePath ));
@@ -25,7 +25,7 @@ public class ConfigSections {
         BufferedSource configRulesFileJson = Okio.buffer(source);
         ConfigSections configSections = gson.fromJson(configRulesFileJson.readUtf8(), ConfigSections.class);
         //TODO improve filtering via maven
-        configSections.filtering(prefix);
+        configSections.filtering(prefix, api);
 
         return configSections;
     }
@@ -61,13 +61,16 @@ public class ConfigSections {
         return false;
     }
 
-    public void filtering(String prefix) {
+    public void filtering(String prefix, String api) {
         if (prefix == null || prefix.isEmpty()) {
             return ;
         }
         getSections().parallelStream().forEach((section) -> {
             if (section.getMatch().contains("${rob.prefix}")) {
                 section.setMatch(prefix.toLowerCase());
+            }
+            if (section.getTitle().contains("${rob.api}")) {
+                section.setTitle( section.getTitle().replace("${rob.api}", api) );
             }
         });
     }

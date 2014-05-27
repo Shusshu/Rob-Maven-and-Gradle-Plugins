@@ -17,16 +17,32 @@ public abstract class RobLogManager {
 
     protected final LocalDate startDate;
     protected final LocalDate endDate;
-    private ConfigSections config;
-    private Logger log;
-    private Map<String, List<String>> commitListMap;
+    private final ConfigSections config;
+    private final Logger log;
+    private final Map<String, List<String>> commitListMap;
 
-    public RobLogManager(Logger log, ConfigSections config, LocalDate startDate, LocalDate endDate) {
+    public RobLogManager(Logger log, ConfigSections config, String fromDate, String toDate) {
         this.commitListMap = new LinkedHashMap<>();
         this.log = log;
         this.config = config;
-        this.startDate = startDate;
-        this.endDate = endDate;
+
+        if (toDate != null && toDate.length() > 0) {
+            this.endDate = LocalDate.parse(toDate, DateTimeFormatter.ISO_LOCAL_DATE);
+
+        } else {
+            this.endDate = LocalDate.now();
+        }
+
+        if (fromDate != null && fromDate.length() > 0) {
+            this.startDate = LocalDate.parse(fromDate, DateTimeFormatter.ISO_LOCAL_DATE);
+        } else {
+            this.startDate = this.endDate.minusDays(14l);
+        }
+
+        if (this.startDate.isAfter(this.endDate)){
+            throw new IllegalArgumentException("'From date' must be before 'to date'");
+        }
+
         initMap();
     }
 
