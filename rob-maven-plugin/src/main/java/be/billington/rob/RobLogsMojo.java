@@ -2,9 +2,7 @@ package be.billington.rob;
 
 
 import be.billington.rob.bitbucket.BitbucketCredentials;
-import be.billington.rob.bitbucket.RobLogBitbucketManager;
 import be.billington.rob.github.GithubCredentials;
-import be.billington.rob.github.RobLogGithubManager;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
@@ -13,12 +11,8 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.slf4j.impl.StaticLoggerBinder;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
-import retrofit.RetrofitError;
 
 import java.io.File;
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 /**
  * Rob logger
