@@ -127,7 +127,7 @@ public class RobLogsMojo extends AbstractMojo
         }
 
         if (startDate.isAfter(endDate)){
-            getLog().error("Start date must be before end date");
+            getLog().error("'From date' must be before 'to date'");
             return false;
         }
         return true;
