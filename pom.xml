@@ -12,7 +12,7 @@
 
     <groupId>be.billington.rob</groupId>
     <artifactId>rob-parent</artifactId>
-    <version>3.0.1</version>
+    <version>3.1.0</version>
 
     <packaging>pom</packaging>
 
@@ -67,6 +67,7 @@
 			</activation>
 			<modules>
 				<module>rob-lib</module>
+				<module>rob-cli</module>
                 <module>rob-maven-plugin</module>
 			</modules>
 		</profile>

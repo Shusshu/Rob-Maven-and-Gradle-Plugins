@@ -53,3 +53,6 @@ build/
 
 #mirror
 mirror/
+
+#Shade
+dependency-reduced-pom.xml
