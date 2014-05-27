@@ -7,13 +7,15 @@ Rob's goal is to generate change log reports for your project by using bitbucket
 
 ## Usage
 
-###Without a project pom.xml
+### Maven
+
+#### Without a project pom.xml
 
 mvn rob:logs -Prob -Drob.repo=Rob-Maven-Plugin -Drob.api=github -Drob.owner=Shusshu
 
 
 
-##With a project pom.xml
+#### With a project pom.xml
 
 Add this to your pom.xml
 
@@ -67,11 +69,47 @@ And this to your settings.xml
             <activeByDefault>false</activeByDefault>
         </activation>
         <properties>
-            <rob.key>your bitbucket key</rob.key>
-            <rob.secret>your bitbucket secret</rob.secret>
-            <rob.github.token>your github token</rob.secret>
+            <rob.key>Your bitbucket key</rob.key>
+            <rob.secret>Your bitbucket secret</rob.secret>
+            <rob.github.token>Your github token</rob.secret>
         </properties>
     </profile>
+
+
+### Gradle
+
+Add the following to the build.gradle
+
+    buildscript {
+      repositories {
+        mavenLocal()
+        mavenCentral()
+      }
+      dependencies {
+        classpath 'be.billington.rob:rob-gradle-plugin:3.0.0'
+      }
+    }
+
+    apply plugin: 'rob-plugin'
+
+
+Add the following to the project gradle.properties
+
+    robApi=bitbucket or github
+    robOwner=The git repository owner
+    robRepository=The git repository name
+    robBranch=The branch
+    robPrefix=The jira prefix
+    robFile=The output file e.g. "./build/changelog.txt"
+
+
+Add the following to the user gradle.properties
+
+    bitbucketKey=Your bitbucket key
+    bitbucketSecret=Your bitbucket secret
+    githubToken=Your github token
+
+
 
 ## OAuth
 

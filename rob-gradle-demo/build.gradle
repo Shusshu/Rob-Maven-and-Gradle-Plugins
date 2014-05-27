@@ -7,7 +7,6 @@ buildscript {
   }
   dependencies {
 	classpath 'be.billington.rob:rob-gradle-plugin:3.0.0'
-    //classpath fileTree(dir: 'libs', include: ['*.jar'])
   }
 }
 
