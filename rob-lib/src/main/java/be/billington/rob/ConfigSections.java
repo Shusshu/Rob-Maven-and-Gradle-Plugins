@@ -67,7 +67,7 @@ public class ConfigSections {
         }
         getSections().parallelStream().forEach((section) -> {
             if (section.getMatch().contains("${rob.prefix}")) {
-                section.setMatch(prefix);
+                section.setMatch(prefix.toLowerCase());
             }
         });
     }
