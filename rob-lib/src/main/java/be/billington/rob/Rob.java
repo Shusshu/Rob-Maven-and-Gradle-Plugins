@@ -36,6 +36,13 @@ public class Rob {
 
             logger.error("Network Error: " + e.getMessage() + " - " + e.getResponse().getStatus() + " - URL: " + e.getUrl(), e);
 
+            if (e.getResponse() != null){
+                switch (e.getResponse().getStatus()) {
+                    case 401: logger.error("Unauthorized - Check your credentials"); break;
+                    default: break;
+                }
+            }
+
         } catch (IOException ioex) {
             logger.error("File Error: " + ioex.getMessage(), ioex);
         }
