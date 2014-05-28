@@ -5,7 +5,6 @@ import be.billington.rob.github.GithubCredentials;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.impl.SimpleLogger;
 
 public class Main {
 
@@ -17,7 +16,7 @@ public class Main {
     private static final String O_FROM_DATE = "fd";
     private static final String O_TO_DATE = "td";
     private static final String O_OUTPUT_FILE = "f";
-    private static final String O_RULES_FILE = "r";
+    private static final String O_CONFIG_FILE = "c";
     private static final String O_BITBUCKET_KEY = "k";
     private static final String O_BITBUCKET_SECRET = "s";
     private static final String O_GITHUB_TOKEN = "t";
@@ -44,6 +43,7 @@ public class Main {
             Rob.logs(logger, api, owner, repo, prefix, branch, rulesFile, filePath, fromDate, toDate, credentials);
 
         } catch (ParseException e) {
+            logger.error("ParseException: " + e.getMessage(), e);
             usage(createParserOptions());
 
         } catch (Exception ex) {
@@ -81,8 +81,8 @@ public class Main {
         } else {
             filePath = "./changelog.txt";
         }
-        if (cmd.hasOption(O_RULES_FILE)) {
-            rulesFile = cmd.getOptionValue(O_RULES_FILE);
+        if (cmd.hasOption(O_CONFIG_FILE)) {
+            rulesFile = cmd.getOptionValue(O_CONFIG_FILE);
         }
         if (cmd.hasOption(O_BITBUCKET_KEY)) {
             key = cmd.getOptionValue(O_BITBUCKET_KEY);
@@ -124,7 +124,7 @@ public class Main {
         Option outputOption = new Option(O_OUTPUT_FILE, "output-file", true, "Output file");
         options.addOption(outputOption);
 
-        Option rulesOption = new Option(O_RULES_FILE, "rules-file", true, "Rules file");
+        Option rulesOption = new Option(O_CONFIG_FILE, "conf", true, "Config file");
         options.addOption(rulesOption);
 
         Option bitbucketKeyOption = new Option(O_BITBUCKET_KEY, "key", true, "bitbucket key");
