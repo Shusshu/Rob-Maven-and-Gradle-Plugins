@@ -69,6 +69,7 @@
 				<module>rob-lib</module>
 				<module>rob-cli</module>
                 <module>rob-maven-plugin</module>
+                <module>rob-swt</module>
 			</modules>
 		</profile>
 	</profiles>

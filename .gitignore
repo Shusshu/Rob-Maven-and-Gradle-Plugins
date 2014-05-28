@@ -56,3 +56,6 @@ mirror/
 
 #Shade
 dependency-reduced-pom.xml
+
+#Rob conf
+**/rob.conf
