@@ -2,6 +2,9 @@ package be.billington.rob;
 
 import be.billington.rob.bitbucket.BitbucketCredentials;
 import be.billington.rob.github.GithubCredentials;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
+import ch.qos.logback.core.ConsoleAppender;
 import okio.BufferedSource;
 import okio.Okio;
 import okio.Source;
@@ -14,8 +17,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import ch.qos.logback.classic.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,17 +27,17 @@ import java.util.Map;
 public class MainSWT {
 
     private Shell shell;
-    private Text txtOwner, txtRepo, txtApi, txtPrefix, txtBranch, txtConsole;
+    private Text txtOwner, txtRepo, txtApi, txtPrefix, txtBranch, txtConsole, txtFilePath, txtFromDate, txtToDate;
     private Logger logger;
-    private static final String CONFIG_KEY = "key";
-    private static final String CONFIG_SECRET = "secret";
-    private static final String CONFIG_TOKEN = "token";
+    public static final String CONFIG_KEY = "key";
+    public static final String CONFIG_SECRET = "secret";
+    public static final String CONFIG_TOKEN = "token";
 
     private Map<String, String> config = new HashMap<>();
 
     public MainSWT(Display display) {
-
-        logger = LoggerFactory.getLogger("");
+        LoggerContext context = new LoggerContext();
+        logger = context.getLogger(MainSWT.class);
 
         shell = new Shell(display);
 
@@ -43,8 +45,9 @@ public class MainSWT {
 
         initConfig();
         initUI();
+        initLogger(context);
 
-        shell.setSize(600, 400);
+        shell.setSize(800, 600);
         shell.setLocation(300, 300);
 
         shell.open();
@@ -54,6 +57,27 @@ public class MainSWT {
                 display.sleep();
             }
         }
+    }
+
+    private void initLogger(LoggerContext context){
+        ConsoleAppender consoleAppender = new ConsoleAppender<>();
+        UIAppender uiAppender = new UIAppender(txtConsole);
+
+        PatternLayoutEncoder pa = new PatternLayoutEncoder();
+        pa.setPattern("%r %5p %c [%t] - %m%n");
+        pa.setContext(context);
+        pa.start();
+
+        uiAppender.setEncoder(pa);
+        uiAppender.setContext(context);
+        uiAppender.start();
+
+        consoleAppender.setEncoder(pa);
+        consoleAppender.setContext(context);
+        consoleAppender.start();
+
+        logger.addAppender(uiAppender);
+        //logger.addAppender(consoleAppender);
     }
 
     private void initConfig(){
@@ -75,8 +99,7 @@ public class MainSWT {
     }
 
     public void initUI() {
-        GridLayout shellLayout = new GridLayout(2, false);
-        shell.setLayout(shellLayout);
+        shell.setLayout(new FillLayout());
 
         //1st column
         Composite container = new Composite(shell, SWT.PUSH);
@@ -127,6 +150,30 @@ public class MainSWT {
         txtBranch.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
         txtBranch.setText("development");
 
+        Label lblFilePath = new Label(container, SWT.NONE);
+        lblFilePath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        lblFilePath.setText("File Path:");
+
+        txtFilePath = new Text(container, SWT.BORDER);
+        txtFilePath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        txtFilePath.setText("./target/changelog.txt");
+
+        Label lblFromDate = new Label(container, SWT.NONE);
+        lblFromDate.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        lblFromDate.setText("From date:");
+
+        txtFromDate = new Text(container, SWT.BORDER);
+        txtFromDate.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        txtFromDate.setText("");
+
+        Label lblToDate = new Label(container, SWT.NONE);
+        lblToDate.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        lblToDate.setText("To date:");
+
+        txtToDate = new Text(container, SWT.BORDER);
+        txtToDate.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        txtToDate.setText("");
+
         Button generate = new Button(container, SWT.PUSH);
         generate.setText("Generate");
         generate.setBounds(50, 50, 80, 30);
@@ -134,7 +181,9 @@ public class MainSWT {
         generate.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                robLogs();
+                new RobThread(logger, txtApi.getText(), txtOwner.getText(), txtRepo.getText(),
+                        txtPrefix.getText(), txtBranch.getText(), txtFilePath.getText(),
+                        txtFromDate.getText(), txtToDate.getText(), config).start();
             }
         });
 
@@ -150,11 +199,34 @@ public class MainSWT {
             }
         });
 
+
+        Button output = new Button(container, SWT.PUSH);
+        output.setText("Output");
+        output.setBounds(50, 50, 80, 30);
+
+        output.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                loadGeneratedFile();
+            }
+        });
+
         //2nd column
         Composite rightContainer = new Composite(shell, SWT.PUSH);
         rightContainer.setLayout(new FillLayout());
+        txtConsole = new Text(rightContainer, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI);
+        txtConsole.setEditable(false);
+    }
 
-        txtConsole = new Text(rightContainer, SWT.MULTI);
+    private void loadGeneratedFile() {
+        try {
+            Source source = Okio.source(new File(txtFilePath.getText()));
+            BufferedSource bufferedSource = Okio.buffer(source);
+            String content = bufferedSource.readUtf8();
+            txtConsole.setText(content);
+        } catch (IOException e) {
+            logger.error("IOException: " + e.getMessage(), e);
+        }
     }
 
     public void center(Shell shell) {
@@ -176,23 +248,4 @@ public class MainSWT {
         display.dispose();
     }
 
-    public void robLogs(){
-        logger.info("Robbing...");
-
-        try {
-            Credentials credentials;
-            if (txtApi.getText().toLowerCase().equals(Rob.API_BITBUCKET)){
-                credentials = new BitbucketCredentials(config.get(CONFIG_KEY), config.get(CONFIG_SECRET));
-            } else {
-                credentials = new GithubCredentials(config.get(CONFIG_TOKEN));
-            }
-            //rulesFile, filePath, fromDate, toDate, credentials);
-            Rob.logs(logger, txtApi.getText(), txtOwner.getText(), txtRepo.getText(), txtPrefix.getText(), txtBranch.getText(), "", "./target/changelog.txt", "", "", credentials);
-
-        } catch (Exception ex) {
-            logger.error("Error: " + ex.getMessage(), ex);
-        }
-
-        logger.info("Robbed.");
-    }
 }
