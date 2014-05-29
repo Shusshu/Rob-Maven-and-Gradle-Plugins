@@ -1,10 +1,11 @@
 package be.billington.rob;
 
-import be.billington.rob.bitbucket.BitbucketCredentials;
-import be.billington.rob.github.GithubCredentials;
+import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.core.ConsoleAppender;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import okio.*;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -14,12 +15,15 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
-import ch.qos.logback.classic.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MainSWT {
@@ -30,8 +34,10 @@ public class MainSWT {
 
     private Shell shell;
     private Text txtOwner, txtRepo, txtApi, txtPrefix, txtBranch, txtConsole, txtFilePath, txtFromDate, txtToDate;
+    private Combo profilesCombo;
     private Logger logger;
-    private File configFile;
+    private File configFile, profileFile;
+    private List<Profile> profiles;
 
     private Map<String, String> config = new HashMap<>();
 
@@ -44,10 +50,10 @@ public class MainSWT {
         shell.setText("Rob");
 
         initConfig();
+        initProfiles();
         initUI();
+        initUIProfiles();
         initLogger(context);
-
-        shell.setSize(1024, 768);
 
         shell.open();
 
@@ -58,7 +64,13 @@ public class MainSWT {
         }
     }
 
-    private void initLogger(LoggerContext context){
+    private void initUIProfiles() {
+        profiles.forEach((p) -> profilesCombo.add(p.getTitle()));
+        bindProfile(0);
+        profilesCombo.select(0);
+    }
+
+    private void initLogger(LoggerContext context) {
         ConsoleAppender consoleAppender = new ConsoleAppender<>();
         UIAppender uiAppender = new UIAppender(txtConsole);
 
@@ -79,14 +91,31 @@ public class MainSWT {
         //logger.addAppender(consoleAppender);
     }
 
-    private void initConfig(){
+    private void initConfig() {
         configFile = new File("./rob.conf");
         try {
-            if (!readConfig()){
+            if (!readConfig()) {
                 createConfig();
             }
 
-        } catch (IOException  e) {
+        } catch (IOException e) {
+            logger.error("IOException: " + e.getMessage(), e);
+        }
+    }
+
+    private void initProfiles() {
+        profileFile = new File("./rob.profiles");
+        try {
+            Gson gson = new Gson();
+            Source source = Okio.source(profileFile);
+            BufferedSource profileGsonSource = Okio.buffer(source);
+            Type listType = new TypeToken<ArrayList<Profile>>() {}.getType();
+            profiles = gson.fromJson(profileGsonSource.readUtf8(), listType);
+
+            profileGsonSource.close();
+            source.close();
+
+        } catch (IOException e) {
             logger.error("IOException: " + e.getMessage(), e);
         }
     }
@@ -107,7 +136,7 @@ public class MainSWT {
     }
 
     private boolean readConfig() throws IOException {
-        if (!configFile.exists()){
+        if (!configFile.exists()) {
             return false;
         }
         boolean simpleCheckatLeastOneLine = false;
@@ -115,7 +144,7 @@ public class MainSWT {
         BufferedSource bufferedSource = Okio.buffer(source);
 
         String line = bufferedSource.readUtf8Line();
-        while (line != null){
+        while (line != null) {
             if (line.contains("=")) {
                 String[] values = line.split("=");
                 if (values.length > 1) {
@@ -144,12 +173,28 @@ public class MainSWT {
     public void initUI() {
         shell.setLayout(new FillLayout());
 
+        Composite leftContainer = new Composite(shell, SWT.PUSH);
+        leftContainer.setLayout(new RowLayout());
+
+        Composite inputContainer = new Composite(leftContainer, SWT.PUSH);
+        inputContainer.setLayout(new RowLayout(SWT.VERTICAL));
+
+        Composite buttonContainer = new Composite(leftContainer, SWT.PUSH);
+        buttonContainer.setLayout(new RowLayout(SWT.VERTICAL));
+
+        profilesCombo = new Combo(inputContainer, SWT.PUSH);
+        profilesCombo.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                super.widgetSelected(e);
+                bindProfile(profilesCombo.getSelectionIndex());
+            }
+        });
         //1st column
-        Composite container = new Composite(shell, SWT.PUSH);
+        Composite container = new Composite(inputContainer, SWT.PUSH);
         GridLayout layout = new GridLayout(2, false);
 
-        layout.marginRight = 5;
-        layout.marginLeft = 10;
+        layout.marginWidth = 10;
         container.setLayout(layout);
 
         Label lblRepo = new Label(container, SWT.NONE);
@@ -157,7 +202,6 @@ public class MainSWT {
 
         txtRepo = new Text(container, SWT.BORDER);
         txtRepo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        txtRepo.setText("wecycle-android-recyclemanager");
 
         Label lblOwner = new Label(container, SWT.NONE);
         GridData gd_lblNewLabel = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
@@ -167,7 +211,7 @@ public class MainSWT {
 
         txtOwner = new Text(container, SWT.BORDER);
         txtOwner.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        txtOwner.setText("afrogleap");
+
 
         Label lblApi = new Label(container, SWT.NONE);
         lblApi.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -175,7 +219,6 @@ public class MainSWT {
 
         txtApi = new Text(container, SWT.BORDER);
         txtApi.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        txtApi.setText("bitbucket");
 
         Label lblPrefix = new Label(container, SWT.NONE);
         lblPrefix.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -183,7 +226,6 @@ public class MainSWT {
 
         txtPrefix = new Text(container, SWT.BORDER);
         txtPrefix.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        txtPrefix.setText("WEC");
 
         Label lblBranch = new Label(container, SWT.NONE);
         lblBranch.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -191,7 +233,6 @@ public class MainSWT {
 
         txtBranch = new Text(container, SWT.BORDER);
         txtBranch.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        txtBranch.setText("development");
 
         Label lblFilePath = new Label(container, SWT.NONE);
         lblFilePath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -199,7 +240,6 @@ public class MainSWT {
 
         txtFilePath = new Text(container, SWT.BORDER);
         txtFilePath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        txtFilePath.setText("./target/changelog.txt");
 
         Label lblFromDate = new Label(container, SWT.NONE);
         lblFromDate.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -207,7 +247,6 @@ public class MainSWT {
 
         txtFromDate = new Text(container, SWT.BORDER);
         txtFromDate.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        txtFromDate.setText("");
 
         Label lblToDate = new Label(container, SWT.NONE);
         lblToDate.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -215,22 +254,19 @@ public class MainSWT {
 
         txtToDate = new Text(container, SWT.BORDER);
         txtToDate.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        txtToDate.setText("");
 
-        Button generate = new Button(container, SWT.PUSH);
+        Button generate = new Button(buttonContainer, SWT.PUSH);
         generate.setText("Generate");
         generate.setBounds(50, 50, 80, 30);
 
         generate.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                new RobThread(logger, txtApi.getText(), txtOwner.getText(), txtRepo.getText(),
-                        txtPrefix.getText(), txtBranch.getText(), txtFilePath.getText(),
-                        txtFromDate.getText(), txtToDate.getText(), config).start();
+                robIt();
             }
         });
 
-        Button output = new Button(container, SWT.PUSH);
+        Button output = new Button(buttonContainer, SWT.PUSH);
         output.setText("Output");
         output.setBounds(50, 50, 80, 30);
 
@@ -241,7 +277,7 @@ public class MainSWT {
             }
         });
 
-        Button settings = new Button(container, SWT.PUSH);
+        Button settings = new Button(buttonContainer, SWT.PUSH);
         settings.setText("Settings");
         settings.setBounds(50, 50, 80, 30);
 
@@ -252,7 +288,18 @@ public class MainSWT {
             }
         });
 
-        Button quit = new Button(container, SWT.PUSH);
+        Button saveProfile = new Button(buttonContainer, SWT.PUSH);
+        saveProfile.setText("Save profile");
+        saveProfile.setBounds(50, 50, 80, 30);
+
+        saveProfile.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                saveProfile();
+            }
+        });
+
+        Button quit = new Button(buttonContainer, SWT.PUSH);
         quit.setText("Quit");
         quit.setBounds(50, 50, 80, 30);
 
@@ -269,6 +316,58 @@ public class MainSWT {
         rightContainer.setLayout(new FillLayout());
         txtConsole = new Text(rightContainer, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI);
         txtConsole.setEditable(false);
+    }
+
+    private void bindProfile(int pos) {
+        if (profiles == null || profiles.isEmpty()) {
+            txtApi.setText("bitbucket");
+            txtOwner.setText("afrogleap");
+            txtRepo.setText("wecycle-android-recyclemanager");
+            txtPrefix.setText("WEC");
+            txtBranch.setText("development");
+            txtFilePath.setText("./target/changelog.txt");
+            txtToDate.setText("");
+            txtFromDate.setText("");
+        } else {
+            Profile profile = profiles.get(pos);
+
+            txtApi.setText(profile.getApi());
+            txtOwner.setText(profile.getOwner());
+            txtRepo.setText(profile.getRepo());
+            txtPrefix.setText(profile.getPrefix());
+            txtBranch.setText(profile.getBranch());
+            txtFilePath.setText(profile.getFilePath());
+            txtToDate.setText(profile.getToDate());
+            txtFromDate.setText(profile.getFromDate());
+        }
+    }
+
+    private void saveProfile() {
+        Profile profile = new Profile(txtApi.getText(), txtOwner.getText(), txtRepo.getText(),
+                txtPrefix.getText(), txtBranch.getText(), "", txtFilePath.getText(),
+                txtFromDate.getText(), txtToDate.getText());
+        if (profiles == null){
+            profiles = new ArrayList<>();
+        }
+
+        profiles.add(profile);
+        try {
+            Sink sink = Okio.sink(profileFile);
+            BufferedSink bufferedSink = Okio.buffer(sink);
+            Gson gson = new Gson();
+            bufferedSink.writeUtf8(gson.toJson(profiles));
+
+            bufferedSink.close();
+            sink.close();
+        } catch (IOException e) {
+            logger.error("IOException: " + e.getMessage(), e);
+        }
+    }
+
+    private void robIt() {
+        new RobThread(logger, txtApi.getText(), txtOwner.getText(), txtRepo.getText(),
+                txtPrefix.getText(), txtBranch.getText(), txtFilePath.getText(),
+                txtFromDate.getText(), txtToDate.getText(), config).start();
     }
 
     private void loadGeneratedFile() {
