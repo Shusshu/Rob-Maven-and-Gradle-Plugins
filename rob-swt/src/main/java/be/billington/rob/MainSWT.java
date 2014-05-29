@@ -24,12 +24,14 @@ import java.util.Map;
 
 public class MainSWT {
 
-    private Shell shell;
-    private Text txtOwner, txtRepo, txtApi, txtPrefix, txtBranch, txtConsole, txtFilePath, txtFromDate, txtToDate;
-    private Logger logger;
     public static final String CONFIG_KEY = "key";
     public static final String CONFIG_SECRET = "secret";
     public static final String CONFIG_TOKEN = "token";
+
+    private Shell shell;
+    private Text txtOwner, txtRepo, txtApi, txtPrefix, txtBranch, txtConsole, txtFilePath, txtFromDate, txtToDate;
+    private Logger logger;
+    private File configFile;
 
     private Map<String, String> config = new HashMap<>();
 
@@ -78,12 +80,10 @@ public class MainSWT {
     }
 
     private void initConfig(){
-        File fileConfig = new File("./rob.conf");
-
+        configFile = new File("./rob.conf");
         try {
-            if (!readConfig(fileConfig)){
+            if (!readConfig()){
                 createConfig();
-                writeConfig(fileConfig);
             }
 
         } catch (IOException  e) {
@@ -91,8 +91,8 @@ public class MainSWT {
         }
     }
 
-    private void writeConfig(File fileConfig) throws IOException {
-        Sink sink = Okio.sink(fileConfig);
+    private void writeConfig() throws IOException {
+        Sink sink = Okio.sink(configFile);
         BufferedSink bufferedSink = Okio.buffer(sink);
 
         this.config.forEach((k, v) -> {
@@ -106,12 +106,12 @@ public class MainSWT {
         sink.close();
     }
 
-    private boolean readConfig(File fileConfig) throws IOException {
-        if (!fileConfig.exists()){
+    private boolean readConfig() throws IOException {
+        if (!configFile.exists()){
             return false;
         }
         boolean simpleCheckatLeastOneLine = false;
-        Source source = Okio.source(fileConfig);
+        Source source = Okio.source(configFile);
         BufferedSource bufferedSource = Okio.buffer(source);
 
         String line = bufferedSource.readUtf8Line();
@@ -131,9 +131,14 @@ public class MainSWT {
         return simpleCheckatLeastOneLine;
     }
 
-    private void createConfig(){
+    private void createConfig() {
         ConfigDialog configDialog = new ConfigDialog(shell, config);
         config = configDialog.open();
+        try {
+            writeConfig();
+        } catch (IOException e) {
+            logger.error("IOException: " + e.getMessage(), e);
+        }
     }
 
     public void initUI() {
