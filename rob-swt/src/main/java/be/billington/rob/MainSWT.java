@@ -65,9 +65,11 @@ public class MainSWT {
     }
 
     private void initUIProfiles() {
-        profiles.forEach((p) -> profilesCombo.add(p.getTitle()));
+        if (profiles != null) {
+            profiles.forEach((p) -> profilesCombo.add(p.getTitle()));
+            profilesCombo.select(0);
+        }
         bindProfile(0);
-        profilesCombo.select(0);
     }
 
     private void initLogger(LoggerContext context) {
