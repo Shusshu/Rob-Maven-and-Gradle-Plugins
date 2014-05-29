@@ -81,12 +81,9 @@ public class MainSWT {
         File fileConfig = new File("./rob.conf");
 
         try {
-            if (!fileConfig.exists()){
+            if (!readConfig(fileConfig)){
                 createConfig();
-
                 writeConfig(fileConfig);
-            } else {
-                readConfig(fileConfig);
             }
 
         } catch (IOException  e) {
@@ -109,23 +106,33 @@ public class MainSWT {
         sink.close();
     }
 
-    private void readConfig(File fileConfig) throws IOException {
+    private boolean readConfig(File fileConfig) throws IOException {
+        if (!fileConfig.exists()){
+            return false;
+        }
+        boolean simpleCheckatLeastOneLine = false;
         Source source = Okio.source(fileConfig);
         BufferedSource bufferedSource = Okio.buffer(source);
 
         String line = bufferedSource.readUtf8Line();
-        while (line != null && !line.isEmpty()){
-            String[] values = line.split("=");
-            this.config.put(values[0], values[1]);
+        while (line != null){
+            if (line.contains("=")) {
+                String[] values = line.split("=");
+                if (values.length > 1) {
+                    this.config.put(values[0], values[1]);
+                }
+            }
 
             line = bufferedSource.readUtf8Line();
+            simpleCheckatLeastOneLine = true;
         }
         bufferedSource.close();
         source.close();
+        return simpleCheckatLeastOneLine;
     }
 
     private void createConfig(){
-        ConfigDialog configDialog = new ConfigDialog(shell);
+        ConfigDialog configDialog = new ConfigDialog(shell, config);
         config = configDialog.open();
     }
 
@@ -218,6 +225,28 @@ public class MainSWT {
             }
         });
 
+        Button output = new Button(container, SWT.PUSH);
+        output.setText("Output");
+        output.setBounds(50, 50, 80, 30);
+
+        output.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                loadGeneratedFile();
+            }
+        });
+
+        Button settings = new Button(container, SWT.PUSH);
+        settings.setText("Settings");
+        settings.setBounds(50, 50, 80, 30);
+
+        settings.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                createConfig();
+            }
+        });
+
         Button quit = new Button(container, SWT.PUSH);
         quit.setText("Quit");
         quit.setBounds(50, 50, 80, 30);
@@ -227,18 +256,6 @@ public class MainSWT {
             public void widgetSelected(SelectionEvent e) {
                 shell.getDisplay().dispose();
                 System.exit(0);
-            }
-        });
-
-
-        Button output = new Button(container, SWT.PUSH);
-        output.setText("Output");
-        output.setBounds(50, 50, 80, 30);
-
-        output.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                loadGeneratedFile();
             }
         });
 

@@ -15,9 +15,13 @@ public class ConfigDialog extends Dialog {
 
     private Map<String, String> config;
 
-    public ConfigDialog(Shell parent) {
+    public ConfigDialog(Shell parent, Map<String, String> currentConfig) {
         super(parent);
-        this.config = new HashMap<>();
+        if (currentConfig == null) {
+            this.config = new HashMap<>();
+        } else {
+            this.config = currentConfig;
+        }
     }
 
     public Map<String, String> open() {
@@ -33,7 +37,9 @@ public class ConfigDialog extends Dialog {
 
         Text txtKey = new Text(dialog, SWT.BORDER);
         txtKey.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        txtKey.setText("xxx");
+        if (config.containsKey(MainSWT.CONFIG_KEY)) {
+            txtKey.setText(config.get(MainSWT.CONFIG_KEY));
+        }
 
         Label lblSecret = new Label(dialog, SWT.NONE);
         lblSecret.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -41,7 +47,9 @@ public class ConfigDialog extends Dialog {
 
         Text txtSecret = new Text(dialog, SWT.BORDER);
         txtSecret.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        txtSecret.setText("yyy");
+        if (config.containsKey(MainSWT.CONFIG_SECRET)) {
+            txtSecret.setText(config.get(MainSWT.CONFIG_SECRET));
+        }
 
         Label lblToken = new Label(dialog, SWT.NONE);
         lblToken.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -49,7 +57,9 @@ public class ConfigDialog extends Dialog {
 
         Text txtToken = new Text(dialog, SWT.BORDER);
         txtToken.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        txtToken.setText("xxxxxqqq");
+        if (config.containsKey(MainSWT.CONFIG_TOKEN)) {
+            txtToken.setText(config.get(MainSWT.CONFIG_TOKEN));
+        }
 
         Button saveClose = new Button(dialog, SWT.PUSH);
         saveClose.setText("Save and Close");
@@ -58,6 +68,10 @@ public class ConfigDialog extends Dialog {
         saveClose.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
+                if (txtKey.getText().isEmpty() && txtSecret.getText().isEmpty() && txtToken.getText().isEmpty()) {
+                    //TODO msg
+                    return ;
+                }
                 config.put(MainSWT.CONFIG_KEY, txtKey.getText());
                 config.put(MainSWT.CONFIG_SECRET, txtSecret.getText());
                 config.put(MainSWT.CONFIG_TOKEN, txtToken.getText());
