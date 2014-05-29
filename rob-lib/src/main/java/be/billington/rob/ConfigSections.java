@@ -27,6 +27,9 @@ public class ConfigSections {
         //TODO improve filtering via maven
         configSections.filtering(prefix, api);
 
+        configRulesFileJson.close();
+        source.close();
+
         return configSections;
     }
 
