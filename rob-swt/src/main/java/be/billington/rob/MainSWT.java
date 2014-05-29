@@ -5,9 +5,7 @@ import be.billington.rob.github.GithubCredentials;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.core.ConsoleAppender;
-import okio.BufferedSource;
-import okio.Okio;
-import okio.Source;
+import okio.*;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -47,8 +45,7 @@ public class MainSWT {
         initUI();
         initLogger(context);
 
-        shell.setSize(800, 600);
-        shell.setLocation(300, 300);
+        shell.setSize(1024, 768);
 
         shell.open();
 
@@ -81,21 +78,55 @@ public class MainSWT {
     }
 
     private void initConfig(){
+        File fileConfig = new File("./rob.conf");
+
         try {
-            Source source = Okio.source(new File("rob.conf"));
-            BufferedSource bufferedSource = Okio.buffer(source);
+            if (!fileConfig.exists()){
+                createConfig();
 
-            String line = bufferedSource.readUtf8Line();
-            while (line != null && !line.isEmpty()){
-                String[] values = line.split("=");
-                config.put(values[0], values[1]);
-
-                line = bufferedSource.readUtf8Line();
+                writeConfig(fileConfig);
+            } else {
+                readConfig(fileConfig);
             }
 
         } catch (IOException  e) {
             logger.error("IOException: " + e.getMessage(), e);
         }
+    }
+
+    private void writeConfig(File fileConfig) throws IOException {
+        Sink sink = Okio.sink(fileConfig);
+        BufferedSink bufferedSink = Okio.buffer(sink);
+
+        this.config.forEach((k, v) -> {
+            try {
+                bufferedSink.writeUtf8(k + "=" + v + "\n");
+            } catch (IOException e) {
+                logger.error("IOException: " + e.getMessage(), e);
+            }
+        });
+        bufferedSink.close();
+        sink.close();
+    }
+
+    private void readConfig(File fileConfig) throws IOException {
+        Source source = Okio.source(fileConfig);
+        BufferedSource bufferedSource = Okio.buffer(source);
+
+        String line = bufferedSource.readUtf8Line();
+        while (line != null && !line.isEmpty()){
+            String[] values = line.split("=");
+            this.config.put(values[0], values[1]);
+
+            line = bufferedSource.readUtf8Line();
+        }
+        bufferedSource.close();
+        source.close();
+    }
+
+    private void createConfig(){
+        ConfigDialog configDialog = new ConfigDialog(shell);
+        config = configDialog.open();
     }
 
     public void initUI() {
@@ -224,6 +255,9 @@ public class MainSWT {
             BufferedSource bufferedSource = Okio.buffer(source);
             String content = bufferedSource.readUtf8();
             txtConsole.setText(content);
+
+            bufferedSource.close();
+            source.close();
         } catch (IOException e) {
             logger.error("IOException: " + e.getMessage(), e);
         }
@@ -247,5 +281,4 @@ public class MainSWT {
         new MainSWT(display);
         display.dispose();
     }
-
 }
