@@ -12,11 +12,11 @@
 
     <groupId>be.billington.rob</groupId>
     <artifactId>rob-parent</artifactId>
-    <version>3.1.0</version>
+    <version>3.1.1</version>
 
     <packaging>pom</packaging>
 
-    <name>Rob Maven Plugin</name>
+    <name>Rob - Parent</name>
     <url>http://www.github.com/Shusshu/Rob-Maven-and-Gradle-Plugins</url>
     <description>Maven Plugin to generate change log reports based on Github or Bitbucket's commit history</description>
     <developers>
@@ -54,6 +54,16 @@
 					<artifactId>maven-plugin-plugin</artifactId>
 					<version>${mavenPluginPluginVersion}</version>
 				</plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>2.3</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>2.4</version>
+                </plugin>
 			</plugins>
 		</pluginManagement>
     </build>
@@ -67,7 +77,7 @@
 			</activation>
 			<modules>
 				<module>rob-lib</module>
-				<module>rob-cli</module>
+                <module>rob-cli</module>
                 <module>rob-maven-plugin</module>
                 <module>rob-swt</module>
 			</modules>

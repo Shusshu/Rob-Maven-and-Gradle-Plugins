@@ -6,7 +6,7 @@ buildscript {
     mavenCentral()
   }
   dependencies {
-	classpath 'be.billington.rob:rob-gradle-plugin:3.1.0'
+	classpath 'be.billington.rob:rob-gradle-plugin:3.1.1'
   }
 }
 
