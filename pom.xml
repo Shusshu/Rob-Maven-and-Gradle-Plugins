@@ -80,6 +80,7 @@
                 <module>rob-cli</module>
                 <module>rob-maven-plugin</module>
                 <module>rob-swt</module>
+                <module>rob-javafx</module>
 			</modules>
 		</profile>
 	</profiles>

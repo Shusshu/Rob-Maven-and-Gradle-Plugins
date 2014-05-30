@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root dividerPositions="0.42642140468227424" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" type="SplitPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="be.billington.rob.MainFX">
+  <items>
+    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="398.0" prefWidth="218.0">
+         <children>
+            <FlowPane prefHeight="398.0" prefWidth="252.0">
+               <children>
+                  <Button id="generate" mnemonicParsing="false" text="Generate" />
+                  <Button id="output" mnemonicParsing="false" text="Output" />
+                  <Button id="quit" mnemonicParsing="false" text="Quit" />
+                  <FlowPane prefHeight="359.0" prefWidth="163.0">
+                     <children>
+                        <Label text="Repository name" />
+                        <TextField id="txtRepo" />
+                        <Label text="Owner" />
+                        <TextField id="txtOwner" />
+                        <Label text="Prefix" />
+                        <TextField id="txtPrefix" />
+                        <Label text="API : " />
+                        <TextField id="txtApi" />
+                        <Label text="Branch" />
+                        <TextField id="txtBranch" />
+                        <Label text="File Path" />
+                        <TextField id="txtFilePath" />
+                        <Label text="Config path" />
+                        <TextField id="txtConfigPath" />
+                        <Label text="From date" />
+                        <DatePicker id="txtFromDate" />
+                        <Label text="To date" />
+                        <DatePicker id="txtToDate" />
+                     </children>
+                  </FlowPane>
+               </children>
+            </FlowPane>
+         </children></AnchorPane>
+    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+         <children>
+            <TextArea id="txtConsole" prefHeight="398.0" prefWidth="340.0" />
+         </children></AnchorPane>
+  </items>
+</fx:root>
