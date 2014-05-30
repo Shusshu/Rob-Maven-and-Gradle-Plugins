@@ -37,8 +37,8 @@ public class ConfigDialog extends Dialog {
 
         Text txtKey = new Text(dialog, SWT.BORDER);
         txtKey.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        if (config.containsKey(MainSWT.CONFIG_KEY)) {
-            txtKey.setText(config.get(MainSWT.CONFIG_KEY));
+        if (config.containsKey(RobRunnable.CONFIG_KEY)) {
+            txtKey.setText(config.get(RobRunnable.CONFIG_KEY));
         }
 
         Label lblSecret = new Label(dialog, SWT.NONE);
@@ -47,8 +47,8 @@ public class ConfigDialog extends Dialog {
 
         Text txtSecret = new Text(dialog, SWT.BORDER);
         txtSecret.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        if (config.containsKey(MainSWT.CONFIG_SECRET)) {
-            txtSecret.setText(config.get(MainSWT.CONFIG_SECRET));
+        if (config.containsKey(RobRunnable.CONFIG_SECRET)) {
+            txtSecret.setText(config.get(RobRunnable.CONFIG_SECRET));
         }
 
         Label lblToken = new Label(dialog, SWT.NONE);
@@ -57,8 +57,8 @@ public class ConfigDialog extends Dialog {
 
         Text txtToken = new Text(dialog, SWT.BORDER);
         txtToken.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        if (config.containsKey(MainSWT.CONFIG_TOKEN)) {
-            txtToken.setText(config.get(MainSWT.CONFIG_TOKEN));
+        if (config.containsKey(RobRunnable.CONFIG_TOKEN)) {
+            txtToken.setText(config.get(RobRunnable.CONFIG_TOKEN));
         }
 
         Button saveClose = new Button(dialog, SWT.PUSH);
@@ -72,9 +72,9 @@ public class ConfigDialog extends Dialog {
                     //TODO msg
                     return ;
                 }
-                config.put(MainSWT.CONFIG_KEY, txtKey.getText());
-                config.put(MainSWT.CONFIG_SECRET, txtSecret.getText());
-                config.put(MainSWT.CONFIG_TOKEN, txtToken.getText());
+                config.put(RobRunnable.CONFIG_KEY, txtKey.getText());
+                config.put(RobRunnable.CONFIG_SECRET, txtSecret.getText());
+                config.put(RobRunnable.CONFIG_TOKEN, txtToken.getText());
                 dialog.close();
             }
         });

@@ -8,6 +8,9 @@ import java.util.Map;
 
 public class RobRunnable implements Runnable {
 
+    public static final String CONFIG_KEY = "key";
+    public static final String CONFIG_SECRET = "secret";
+    public static final String CONFIG_TOKEN = "token";
     private final Logger logger;
     private final String api, owner, repo, prefix, branch, filePath, fromDate, toDate;
     private final Map<String, String> config;
@@ -36,9 +39,9 @@ public class RobRunnable implements Runnable {
         try {
             Credentials credentials;
             if (api.toLowerCase().equals(Rob.API_BITBUCKET)){
-                credentials = new BitbucketCredentials(config.get(MainSWT.CONFIG_KEY), config.get(MainSWT.CONFIG_SECRET));
+                credentials = new BitbucketCredentials(config.get(CONFIG_KEY), config.get(CONFIG_SECRET));
             } else {
-                credentials = new GithubCredentials(config.get(MainSWT.CONFIG_TOKEN));
+                credentials = new GithubCredentials(config.get(CONFIG_TOKEN));
             }
             Rob.logs(logger, api, owner, repo, prefix, branch, "", filePath, fromDate, toDate, credentials);
 

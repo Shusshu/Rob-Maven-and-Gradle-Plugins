@@ -30,10 +30,6 @@ import java.util.concurrent.Executors;
 
 public class MainSWT {
 
-    public static final String CONFIG_KEY = "key";
-    public static final String CONFIG_SECRET = "secret";
-    public static final String CONFIG_TOKEN = "token";
-
     private Shell shell;
     private Text txtOwner, txtRepo, txtApi, txtPrefix, txtBranch, txtConsole, txtFilePath, txtFromDate, txtToDate;
     private Combo profilesCombo;
@@ -184,14 +180,11 @@ public class MainSWT {
     public void initUI() {
         shell.setLayout(new FillLayout());
 
-        Composite leftContainer = new Composite(shell, SWT.PUSH);
-        leftContainer.setLayout(new RowLayout());
-
-        Composite inputContainer = new Composite(leftContainer, SWT.PUSH);
+        Composite inputContainer = new Composite(shell, SWT.BORDER);
         inputContainer.setLayout(new RowLayout(SWT.VERTICAL));
 
-        Composite buttonContainer = new Composite(leftContainer, SWT.PUSH);
-        buttonContainer.setLayout(new RowLayout(SWT.VERTICAL));
+        ToolBar bar = new ToolBar (inputContainer, SWT.FLAT | SWT.BORDER);
+        initToolBar(bar);
 
         profilesCombo = new Combo(inputContainer, SWT.PUSH);
         profilesCombo.addSelectionListener(new SelectionAdapter() {
@@ -201,6 +194,7 @@ public class MainSWT {
                 bindProfile(profilesCombo.getSelectionIndex());
             }
         });
+
         //1st column
         Composite container = new Composite(inputContainer, SWT.PUSH);
         GridLayout layout = new GridLayout(2, false);
@@ -266,10 +260,16 @@ public class MainSWT {
         txtToDate = new Text(container, SWT.BORDER);
         txtToDate.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
-        Button generate = new Button(buttonContainer, SWT.PUSH);
-        generate.setText("Generate");
-        generate.setBounds(50, 50, 80, 30);
+        //2nd column
+        Composite rightContainer = new Composite(shell, SWT.BORDER);
+        rightContainer.setLayout(new FillLayout());
+        txtConsole = new Text(rightContainer, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI);
+        txtConsole.setEditable(false);
+    }
 
+    private void initToolBar(ToolBar bar) {
+        ToolItem generate = new ToolItem(bar, SWT.PUSH);
+        generate.setText("Generate");
         generate.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -277,9 +277,10 @@ public class MainSWT {
             }
         });
 
-        Button output = new Button(buttonContainer, SWT.PUSH);
-        output.setText("Output");
-        output.setBounds(50, 50, 80, 30);
+        new ToolItem(bar, SWT.SEPARATOR);
+
+        ToolItem output = new ToolItem(bar, SWT.PUSH);
+        output.setText("Display output");
 
         output.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -288,9 +289,10 @@ public class MainSWT {
             }
         });
 
-        Button settings = new Button(buttonContainer, SWT.PUSH);
+        new ToolItem(bar, SWT.SEPARATOR);
+
+        ToolItem settings = new ToolItem(bar, SWT.PUSH);
         settings.setText("Settings");
-        settings.setBounds(50, 50, 80, 30);
 
         settings.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -299,20 +301,10 @@ public class MainSWT {
             }
         });
 
-        Button removeProfile = new Button(buttonContainer, SWT.PUSH);
-        removeProfile.setText("Remove current profile");
-        removeProfile.setBounds(50, 50, 80, 30);
+        new ToolItem(bar, SWT.SEPARATOR);
 
-        removeProfile.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                removeCurrentProfile();
-            }
-        });
-
-        Button saveProfile = new Button(buttonContainer, SWT.PUSH);
-        saveProfile.setText("Save profile");
-        saveProfile.setBounds(50, 50, 80, 30);
+        ToolItem saveProfile = new ToolItem(bar, SWT.PUSH);
+        saveProfile.setText("Save/Add profile");
 
         saveProfile.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -321,9 +313,22 @@ public class MainSWT {
             }
         });
 
-        Button quit = new Button(buttonContainer, SWT.PUSH);
+        new ToolItem(bar, SWT.SEPARATOR);
+
+        ToolItem removeProfile = new ToolItem(bar, SWT.PUSH);
+        removeProfile.setText("Remove current profile");
+
+        removeProfile.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                removeCurrentProfile();
+            }
+        });
+
+        new ToolItem(bar, SWT.SEPARATOR);
+
+        ToolItem quit = new ToolItem(bar, SWT.PUSH);
         quit.setText("Quit");
-        quit.setBounds(50, 50, 80, 30);
 
         quit.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -332,12 +337,6 @@ public class MainSWT {
                 System.exit(0);
             }
         });
-
-        //2nd column
-        Composite rightContainer = new Composite(shell, SWT.PUSH);
-        rightContainer.setLayout(new FillLayout());
-        txtConsole = new Text(rightContainer, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI);
-        txtConsole.setEditable(false);
     }
 
     private void bindProfile(int pos) {
