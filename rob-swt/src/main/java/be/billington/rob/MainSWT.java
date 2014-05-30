@@ -55,7 +55,7 @@ public class MainSWT {
         initConfig();
         initProfiles();
         initUI();
-        initUIProfiles();
+        initUIProfiles(false);
         initLogger(context);
 
         shell.open();
@@ -67,12 +67,18 @@ public class MainSWT {
         }
     }
 
-    private void initUIProfiles() {
-        if (profiles != null) {
-            profiles.forEach((p) -> profilesCombo.add(p.getTitle()));
-            profilesCombo.select(0);
+    private void initUIProfiles(boolean last) {
+        int pos = 0;
+        if (last){
+            pos = profiles.size() - 1;
         }
-        bindProfile(0);
+        if (profiles != null) {
+            profilesCombo.removeAll();
+            profiles.forEach((p) -> profilesCombo.add(p.getTitle()));
+            profilesCombo.select(pos);
+        }
+
+        bindProfile(pos);
     }
 
     private void initLogger(LoggerContext context) {
@@ -293,6 +299,17 @@ public class MainSWT {
             }
         });
 
+        Button removeProfile = new Button(buttonContainer, SWT.PUSH);
+        removeProfile.setText("Remove current profile");
+        removeProfile.setBounds(50, 50, 80, 30);
+
+        removeProfile.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                removeCurrentProfile();
+            }
+        });
+
         Button saveProfile = new Button(buttonContainer, SWT.PUSH);
         saveProfile.setText("Save profile");
         saveProfile.setBounds(50, 50, 80, 30);
@@ -347,6 +364,11 @@ public class MainSWT {
         }
     }
 
+    private void removeCurrentProfile(){
+        profiles.remove(profilesCombo.getSelectionIndex());
+        initUIProfiles(true);
+    }
+
     private void saveProfile() {
         Profile profile = new Profile(txtApi.getText(), txtOwner.getText(), txtRepo.getText(),
                 txtPrefix.getText(), txtBranch.getText(), "", txtFilePath.getText(),
@@ -354,8 +376,8 @@ public class MainSWT {
         if (profiles == null){
             profiles = new ArrayList<>();
         }
-
         profiles.add(profile);
+        initUIProfiles(true);
         try {
             Sink sink = Okio.sink(profileFile);
             BufferedSink bufferedSink = Okio.buffer(sink);
