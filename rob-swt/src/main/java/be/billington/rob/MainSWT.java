@@ -21,6 +21,7 @@ import org.eclipse.swt.widgets.*;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -357,18 +358,12 @@ public class MainSWT {
             txtBranch.setText(profile.getBranch());
             txtFilePath.setText(profile.getFilePath());
             if (profile.getFromDate() != null && !profile.getFromDate().isEmpty()) {
-                String[] dateSplit = profile.getFromDate().split("-");
-                int year = Integer.valueOf(dateSplit[0]);
-                int month = Integer.valueOf(dateSplit[1]) - 1;
-                int day = Integer.valueOf(dateSplit[2]);
-                dateFrom.setDate(year, month, day);
+                LocalDate date = LocalDate.parse(profile.getFromDate());
+                dateFrom.setDate(date.getYear(), date.getMonthValue() - 1, date.getDayOfMonth());
             }
             if (profile.getToDate() != null && !profile.getToDate().isEmpty()) {
-                String[] dateSplit = profile.getToDate().split("-");
-                int year = Integer.valueOf(dateSplit[0]);
-                int month = Integer.valueOf(dateSplit[1]) - 1;
-                int day = Integer.valueOf(dateSplit[2]);
-                dateTo.setDate(year, month, day);
+                LocalDate date = LocalDate.parse(profile.getToDate());
+                dateTo.setDate(date.getYear(), date.getMonthValue() - 1, date.getDayOfMonth());
             }
         }
     }
@@ -378,21 +373,9 @@ public class MainSWT {
         initUIProfiles(true);
     }
 
-    private String convertDateToStr(DateTime date){
-        int month = date.getMonth() + 1;
-        int day = date.getDay();
-        String monthStr, dayStr;
-        if (month < 10){
-            monthStr = "0" + month;
-        } else {
-            monthStr = String.valueOf(month);
-        }
-        if (day < 10){
-            dayStr = "0" + day;
-        } else {
-            dayStr = String.valueOf(day);
-        }
-        return date.getYear() + "-" + monthStr + "-" + dayStr;
+    private String convertDateToStr(DateTime dateTime){
+        LocalDate date = LocalDate.of(dateTime.getYear(), dateTime.getMonth() + 1, dateTime.getDay());
+        return date.toString();
     }
 
     private void saveProfile() {
