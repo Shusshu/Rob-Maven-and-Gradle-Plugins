@@ -32,7 +32,7 @@ import java.util.concurrent.Executors;
 public class MainSWT {
 
     private Shell shell;
-    private Text txtOwner, txtRepo, txtApi, txtPrefix, txtBranch, txtConsole, txtFilePath;
+    private Text txtOwner, txtRepo, txtApi, txtPrefix, txtBranch, txtConsole, txtFilePath, txtConfigPath;
     private DateTime dateFrom, dateTo;
     private Combo profilesCombo;
     private Logger logger;
@@ -245,8 +245,54 @@ public class MainSWT {
         lblFilePath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
         lblFilePath.setText("File Path:");
 
-        txtFilePath = new Text(container, SWT.BORDER);
-        txtFilePath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        Composite filePathComposite = new Composite(container, SWT.FLAT);
+        filePathComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
+
+        txtFilePath = new Text(filePathComposite, SWT.BORDER);
+
+        Button fileChooser = new Button(filePathComposite, SWT.PUSH);
+        fileChooser.setText("Browse...");
+
+        fileChooser.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                super.widgetSelected(e);
+                FileDialog dialog = new FileDialog(shell);
+
+                String filePath = dialog.open();
+
+                if (filePath != null) {
+                    txtFilePath.setText(filePath);
+                }
+            }
+        });
+
+
+        Label lblConfigPath = new Label(container, SWT.NONE);
+        lblConfigPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        lblConfigPath.setText("Config Path:");
+
+        Composite configPathComposite = new Composite(container, SWT.FLAT);
+        configPathComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
+
+        txtConfigPath = new Text(configPathComposite, SWT.BORDER);
+
+        Button configFileChooser = new Button(configPathComposite, SWT.PUSH);
+        configFileChooser.setText("Browse...");
+
+        configFileChooser.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                super.widgetSelected(e);
+                FileDialog dialog = new FileDialog(shell);
+
+                String filePath = dialog.open();
+
+                if (filePath != null) {
+                    txtConfigPath.setText(filePath);
+                }
+            }
+        });
 
         Label lblFromDate = new Label(container, SWT.NONE);
         lblFromDate.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -447,7 +493,6 @@ public class MainSWT {
 
         shell.setBounds(nLeft, nTop, p.x, p.y);
     }
-
 
     public static void main(String[] args) {
         Display display = new Display();
