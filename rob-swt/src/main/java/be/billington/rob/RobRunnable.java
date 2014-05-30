@@ -6,16 +6,13 @@ import org.slf4j.Logger;
 
 import java.util.Map;
 
-/**
- * Created by Shu on 28/05/2014.
- */
-public class RobThread extends Thread {
+public class RobRunnable implements Runnable {
 
     private final Logger logger;
     private final String api, owner, repo, prefix, branch, filePath, fromDate, toDate;
     private final Map<String, String> config;
 
-    public RobThread(Logger logger, String api, String owner, String repo, String prefix, String branch, String filePath, String fromDate, String toDate, Map<String, String> config){
+    public RobRunnable(Logger logger, String api, String owner, String repo, String prefix, String branch, String filePath, String fromDate, String toDate, Map<String, String> config){
         this.logger = logger;
         this.api = api;
         this.owner = owner;
@@ -30,8 +27,6 @@ public class RobThread extends Thread {
 
     @Override
     public void run() {
-        super.run();
-
         robLogs();
     }
 

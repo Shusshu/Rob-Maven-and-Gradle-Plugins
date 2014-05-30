@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainSWT {
 
@@ -38,6 +40,7 @@ public class MainSWT {
     private Logger logger;
     private File configFile, profileFile;
     private List<Profile> profiles;
+    private ExecutorService pool = Executors.newFixedThreadPool(4);
 
     private Map<String, String> config = new HashMap<>();
 
@@ -367,9 +370,10 @@ public class MainSWT {
     }
 
     private void robIt() {
-        new RobThread(logger, txtApi.getText(), txtOwner.getText(), txtRepo.getText(),
+        pool.execute( new RobRunnable(logger, txtApi.getText(), txtOwner.getText(), txtRepo.getText(),
                 txtPrefix.getText(), txtBranch.getText(), txtFilePath.getText(),
-                txtFromDate.getText(), txtToDate.getText(), config).start();
+                txtFromDate.getText(), txtToDate.getText(), config) );
+
     }
 
     private void loadGeneratedFile() {
