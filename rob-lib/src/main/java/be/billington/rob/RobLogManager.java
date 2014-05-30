@@ -148,8 +148,9 @@ public abstract class RobLogManager {
             } else {
                 file = new File( filePath );
             }
-
+            file.getParentFile().mkdirs();
             file.createNewFile();
+
             buffer.writeTo(new FileOutputStream( file ));
 
             getLog().info("Report: " + file.getPath());

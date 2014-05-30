@@ -65,14 +65,11 @@ public class ConfigSections {
     }
 
     public void filtering(String prefix, String api) {
-        if (prefix == null || prefix.isEmpty()) {
-            return ;
-        }
         getSections().parallelStream().forEach((section) -> {
-            if (section.getMatch().contains("${rob.prefix}")) {
+            if (prefix != null && !prefix.isEmpty() && section.getMatch().contains("${rob.prefix}")) {
                 section.setMatch(prefix.toLowerCase());
             }
-            if (section.getTitle().contains("${rob.api}")) {
+            if (api != null && !api.isEmpty() && section.getTitle().contains("${rob.api}")) {
                 section.setTitle( section.getTitle().replace("${rob.api}", api) );
             }
         });
