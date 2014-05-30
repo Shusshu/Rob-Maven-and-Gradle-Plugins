@@ -31,7 +31,8 @@ import java.util.concurrent.Executors;
 public class MainSWT {
 
     private Shell shell;
-    private Text txtOwner, txtRepo, txtApi, txtPrefix, txtBranch, txtConsole, txtFilePath, txtFromDate, txtToDate;
+    private Text txtOwner, txtRepo, txtApi, txtPrefix, txtBranch, txtConsole, txtFilePath;
+    private DateTime dateFrom, dateTo;
     private Combo profilesCombo;
     private Logger logger;
     private File configFile, profileFile;
@@ -250,15 +251,13 @@ public class MainSWT {
         lblFromDate.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
         lblFromDate.setText("From date:");
 
-        txtFromDate = new Text(container, SWT.BORDER);
-        txtFromDate.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        dateFrom = new DateTime(container, SWT.BORDER | SWT.DATE | SWT.DROP_DOWN);
 
         Label lblToDate = new Label(container, SWT.NONE);
         lblToDate.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
         lblToDate.setText("To date:");
 
-        txtToDate = new Text(container, SWT.BORDER);
-        txtToDate.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        dateTo = new DateTime(container, SWT.BORDER | SWT.DATE | SWT.DROP_DOWN);
 
         //2nd column
         Composite rightContainer = new Composite(shell, SWT.BORDER);
@@ -347,8 +346,7 @@ public class MainSWT {
             txtPrefix.setText("WEC");
             txtBranch.setText("development");
             txtFilePath.setText("./target/changelog.txt");
-            txtToDate.setText("");
-            txtFromDate.setText("");
+
         } else {
             Profile profile = profiles.get(pos);
 
@@ -358,8 +356,20 @@ public class MainSWT {
             txtPrefix.setText(profile.getPrefix());
             txtBranch.setText(profile.getBranch());
             txtFilePath.setText(profile.getFilePath());
-            txtToDate.setText(profile.getToDate());
-            txtFromDate.setText(profile.getFromDate());
+            if (profile.getFromDate() != null && !profile.getFromDate().isEmpty()) {
+                String[] dateSplit = profile.getFromDate().split("-");
+                int year = Integer.valueOf(dateSplit[0]);
+                int month = Integer.valueOf(dateSplit[1]) - 1;
+                int day = Integer.valueOf(dateSplit[2]);
+                dateFrom.setDate(year, month, day);
+            }
+            if (profile.getToDate() != null && !profile.getToDate().isEmpty()) {
+                String[] dateSplit = profile.getToDate().split("-");
+                int year = Integer.valueOf(dateSplit[0]);
+                int month = Integer.valueOf(dateSplit[1]) - 1;
+                int day = Integer.valueOf(dateSplit[2]);
+                dateTo.setDate(year, month, day);
+            }
         }
     }
 
@@ -368,10 +378,35 @@ public class MainSWT {
         initUIProfiles(true);
     }
 
+    private String convertDateToStr(DateTime date){
+        int month = date.getMonth() + 1;
+        int day = date.getDay();
+        String monthStr, dayStr;
+        if (month < 10){
+            monthStr = "0" + month;
+        } else {
+            monthStr = String.valueOf(month);
+        }
+        if (day < 10){
+            dayStr = "0" + day;
+        } else {
+            dayStr = String.valueOf(day);
+        }
+        return date.getYear() + "-" + monthStr + "-" + dayStr;
+    }
+
     private void saveProfile() {
+
+        String dateFromStr = convertDateToStr(dateFrom);
+        String dateToStr = convertDateToStr(dateTo);
+
+        if (dateFromStr.equals(dateToStr)){
+            dateFromStr = "";
+        }
+
         Profile profile = new Profile(txtApi.getText(), txtOwner.getText(), txtRepo.getText(),
                 txtPrefix.getText(), txtBranch.getText(), "", txtFilePath.getText(),
-                txtFromDate.getText(), txtToDate.getText());
+                dateFromStr, dateToStr);
         if (profiles == null){
             profiles = new ArrayList<>();
         }
@@ -391,9 +426,16 @@ public class MainSWT {
     }
 
     private void robIt() {
+        String dateFromStr = convertDateToStr(dateFrom);
+        String dateToStr = convertDateToStr(dateTo);
+
+        if (dateFromStr.equals(dateToStr)){
+            dateFromStr = "";
+        }
+
         pool.execute( new RobRunnable(logger, txtApi.getText(), txtOwner.getText(), txtRepo.getText(),
                 txtPrefix.getText(), txtBranch.getText(), txtFilePath.getText(),
-                txtFromDate.getText(), txtToDate.getText(), config) );
+                dateFromStr, dateToStr, config) );
 
     }
 
