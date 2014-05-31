@@ -10,10 +10,7 @@ import javafx.application.Application;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 import okio.*;
 
@@ -46,7 +43,7 @@ public class MainFX extends Application {
     @FXML
     private TextField txtBranch;
     @FXML
-    private TextField txtConsole;
+    private TextArea txtConsole;
     @FXML
     private TextField txtFilePath;
     @FXML
@@ -92,19 +89,21 @@ public class MainFX extends Application {
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
-        this.primaryStage.setTitle("AddressApp");
+        this.primaryStage.setTitle("Rob");
+        initRootLayout();
+    }
 
+    @FXML
+    private void initialize() {
         LoggerContext context = new LoggerContext();
         logger = context.getLogger(MainFX.class);
 
         initConfig();
         initProfiles();
 
-        initRootLayout();
-        initButtonActions();
-        //TODO initUIProfiles(false);
+        initUIProfiles(false);
 
-        initLogger(context);
+        initUILogger(context);
     }
 
     private void initUIProfiles(boolean last) {
@@ -121,7 +120,7 @@ public class MainFX extends Application {
         bindProfile(pos);
     }
 
-    private void initLogger(LoggerContext context) {
+    private void initUILogger(LoggerContext context) {
         ConsoleAppender consoleAppender = new ConsoleAppender<>();
         UIAppender uiAppender = new UIAppender(txtConsole);
 
@@ -252,8 +251,12 @@ public class MainFX extends Application {
             txtPrefix.setText(profile.getPrefix());
             txtBranch.setText(profile.getBranch());
             txtFilePath.setText(profile.getFilePath());
-            txtToDate.setValue(LocalDate.parse(profile.getToDate()));
-            txtFromDate.setValue(LocalDate.parse(profile.getFromDate()));
+            if (profile.getToDate() != null && !profile.getToDate().isEmpty()) {
+                txtToDate.setValue(LocalDate.parse(profile.getToDate()));
+            }
+            if (profile.getFromDate() != null && !profile.getFromDate().isEmpty()) {
+                txtFromDate.setValue(LocalDate.parse(profile.getFromDate()));
+            }
         }
     }
 /*
@@ -286,9 +289,16 @@ public class MainFX extends Application {
 
     @FXML
     protected void robIt() {
+        String dateFromStr = "", dateToStr = "";
+        if (txtFromDate != null && txtFromDate.getValue() != null){
+            dateFromStr = txtFromDate.getValue().toString();
+        }
+        if (txtToDate != null && txtToDate.getValue() != null){
+            dateToStr = txtToDate.getValue().toString();
+        }
         pool.execute( new RobRunnable(logger, txtApi.getText(), txtOwner.getText(), txtRepo.getText(),
                 txtPrefix.getText(), txtBranch.getText(), txtFilePath.getText(),
-                txtFromDate.getValue().toString(), txtToDate.getValue().toString(), config) );
+                dateFromStr, dateToStr, config) );
 
     }
 

@@ -1,21 +1,22 @@
 package be.billington.rob;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
-import javafx.scene.control.TextField;
+import javafx.application.Platform;
+import javafx.scene.control.TextArea;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 
 public class UIAppender extends AppenderBase<ILoggingEvent> {
 
     private PatternLayoutEncoder encoder;
     private ByteArrayOutputStream out;
-    private TextField text;
+    private TextArea text;
 
-    public UIAppender(TextField text){
+    public UIAppender(TextArea text) {
         this.out = new ByteArrayOutputStream();
         this.text = text;
     }
@@ -23,7 +24,7 @@ public class UIAppender extends AppenderBase<ILoggingEvent> {
     @Override
     public void start() {
         if (this.encoder == null) {
-            addError("No encoder set for the appender named ["+ name +"].");
+            addError("No encoder set for the appender named [" + name + "].");
             return;
         }
 
@@ -38,7 +39,7 @@ public class UIAppender extends AppenderBase<ILoggingEvent> {
         // output the events as formatted by the wrapped layout
         try {
             this.encoder.doEncode(event);
-            text.appendText("\n" + event.getFormattedMessage());
+            Platform.runLater( () -> text.appendText("\n" + event.getFormattedMessage()) );
 
         } catch (IOException e) {
         }
