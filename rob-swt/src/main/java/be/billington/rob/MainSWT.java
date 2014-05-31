@@ -419,19 +419,10 @@ public class MainSWT {
         initUIProfiles(true);
     }
 
-    private String convertDateToStr(DateTime dateTime){
-        LocalDate date = LocalDate.of(dateTime.getYear(), dateTime.getMonth() + 1, dateTime.getDay());
-        return date.toString();
-    }
-
     private void saveProfile() {
 
-        String dateFromStr = convertDateToStr(dateFrom);
-        String dateToStr = convertDateToStr(dateTo);
-
-        if (dateFromStr.equals(dateToStr)){
-            dateFromStr = "";
-        }
+        String dateFromStr = LocalDate.of(dateFrom.getYear(), dateFrom.getMonth() + 1, dateFrom.getDay()).toString();
+        String dateToStr = LocalDate.of(dateTo.getYear(), dateTo.getMonth() + 1, dateTo.getDay()).toString();
 
         Profile profile = new Profile(txtApi.getText(), txtOwner.getText(), txtRepo.getText(),
                 txtPrefix.getText(), txtBranch.getText(), "", txtFilePath.getText(),
@@ -455,12 +446,8 @@ public class MainSWT {
     }
 
     private void robIt() {
-        String dateFromStr = convertDateToStr(dateFrom);
-        String dateToStr = convertDateToStr(dateTo);
-
-        if (dateFromStr.equals(dateToStr)){
-            dateFromStr = "";
-        }
+        String dateFromStr = LocalDate.of(dateFrom.getYear(), dateFrom.getMonth() + 1, dateFrom.getDay()).toString();
+        String dateToStr = LocalDate.of(dateTo.getYear(), dateTo.getMonth() + 1, dateTo.getDay()).toString();
 
         pool.execute( new RobRunnable(logger, txtApi.getText(), txtOwner.getText(), txtRepo.getText(),
                 txtPrefix.getText(), txtBranch.getText(), txtFilePath.getText(),
