@@ -11,6 +11,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -19,6 +20,7 @@ import okio.*;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,16 +50,10 @@ public class MainFX extends Application {
     @FXML
     private TextField txtFilePath;
     @FXML
-    private TextField txtFromDate;
+    private DatePicker txtFromDate;
     @FXML
-    private TextField txtToDate;
+    private DatePicker txtToDate;
 
-    @FXML
-    private Button generate;
-    @FXML
-    private Button output;
-    @FXML
-    private Button quit;
     //private Combo profilesCombo;
 
     private Logger logger;
@@ -80,12 +76,14 @@ public class MainFX extends Application {
             // Load root layout from fxml file.
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(MainFX.class.getResource("/be/billington/rob/Layout2.fxml"));
+
             rootLayout = loader.load();
 
             // Show the scene containing the root layout.
             Scene scene = new Scene(rootLayout);
             primaryStage.setScene(scene);
             primaryStage.show();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -99,29 +97,29 @@ public class MainFX extends Application {
         LoggerContext context = new LoggerContext();
         logger = context.getLogger(MainFX.class);
 
-       // initConfig();
+        initConfig();
         initProfiles();
 
         initRootLayout();
         initButtonActions();
+        //TODO initUIProfiles(false);
 
-       // initUIProfiles(false);
         initLogger(context);
     }
-/*
+
     private void initUIProfiles(boolean last) {
         int pos = 0;
         if (last){
             pos = profiles.size() - 1;
         }
         if (profiles != null) {
-            profilesCombo.removeAll();
-            profiles.forEach((p) -> profilesCombo.add(p.getTitle()));
-            profilesCombo.select(pos);
+            //TODO profilesCombo.removeAll();
+            //TODO profiles.forEach((p) -> profilesCombo.add(p.getTitle()));
+            //TODO profilesCombo.select(pos);
         }
 
         bindProfile(pos);
-    }*/
+    }
 
     private void initLogger(LoggerContext context) {
         ConsoleAppender consoleAppender = new ConsoleAppender<>();
@@ -142,7 +140,7 @@ public class MainFX extends Application {
 
         logger.addAppender(uiAppender);
         //logger.addAppender(consoleAppender);
-    }/*
+    }
 
     private void initConfig() {
         configFile = new File("./rob.conf");
@@ -155,7 +153,7 @@ public class MainFX extends Application {
             logger.error("IOException: " + e.getMessage(), e);
         }
     }
-*/
+
     private void initProfiles() {
         profileFile = new File("./rob.profiles");
         try {
@@ -212,21 +210,21 @@ public class MainFX extends Application {
         source.close();
         return simpleCheckatLeastOneLine;
     }
-/*
+
     private void createConfig() {
-        ConfigDialog configDialog = new ConfigDialog(shell, config);
-        config = configDialog.open();
+        //TODO dialog is config is missing ConfigDialog configDialog = new ConfigDialog(shell, config);
+        //TODO config = configDialog.open();
         try {
             writeConfig();
         } catch (IOException e) {
             logger.error("IOException: " + e.getMessage(), e);
         }
-    }*/
+    }
 
     private void initButtonActions() {
-        generate.setOnAction((event) -> robIt());
+        //generate.setOnAction((event) -> robIt());
 
-        output.setOnAction((event) -> loadGeneratedFile());
+        //output.setOnAction((event) -> loadGeneratedFile());
 
         /*settings.setOnAction((event) -> createConfig());
 
@@ -234,7 +232,7 @@ public class MainFX extends Application {
 
         removeProfile.setOnAction((event) -> removeCurrentProfile());*/
 
-        quit.setOnAction((event) -> System.exit(0));
+        //quit.setOnAction((event) -> quit());
     }
 
     private void bindProfile(int pos) {
@@ -245,8 +243,6 @@ public class MainFX extends Application {
             txtPrefix.setText("WEC");
             txtBranch.setText("development");
             txtFilePath.setText("./target/changelog.txt");
-            txtToDate.setText("");
-            txtFromDate.setText("");
         } else {
             Profile profile = profiles.get(pos);
 
@@ -256,8 +252,8 @@ public class MainFX extends Application {
             txtPrefix.setText(profile.getPrefix());
             txtBranch.setText(profile.getBranch());
             txtFilePath.setText(profile.getFilePath());
-            txtToDate.setText(profile.getToDate());
-            txtFromDate.setText(profile.getFromDate());
+            txtToDate.setValue(LocalDate.parse(profile.getToDate()));
+            txtFromDate.setValue(LocalDate.parse(profile.getFromDate()));
         }
     }
 /*
@@ -269,7 +265,7 @@ public class MainFX extends Application {
     private void saveProfile() {
         Profile profile = new Profile(txtApi.getText(), txtOwner.getText(), txtRepo.getText(),
                 txtPrefix.getText(), txtBranch.getText(), "", txtFilePath.getText(),
-                txtFromDate.getText(), txtToDate.getText());
+                txtFromDate.getValue().toString(), txtToDate.getValue().toString());
         if (profiles == null){
             profiles = new ArrayList<>();
         }
@@ -288,14 +284,16 @@ public class MainFX extends Application {
         }
     }*/
 
-    private void robIt() {
+    @FXML
+    protected void robIt() {
         pool.execute( new RobRunnable(logger, txtApi.getText(), txtOwner.getText(), txtRepo.getText(),
                 txtPrefix.getText(), txtBranch.getText(), txtFilePath.getText(),
-                txtFromDate.getText(), txtToDate.getText(), config) );
+                txtFromDate.getValue().toString(), txtToDate.getValue().toString(), config) );
 
     }
 
-    private void loadGeneratedFile() {
+    @FXML
+    protected void loadGeneratedFile() {
         try {
             Source source = Okio.source(new File(txtFilePath.getText()));
             BufferedSource bufferedSource = Okio.buffer(source);
@@ -307,6 +305,11 @@ public class MainFX extends Application {
         } catch (IOException e) {
             logger.error("IOException: " + e.getMessage(), e);
         }
+    }
+
+    @FXML
+    private void quit(){
+        System.exit(0);
     }
 
 }
