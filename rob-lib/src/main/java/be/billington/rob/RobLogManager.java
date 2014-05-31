@@ -33,7 +33,7 @@ public abstract class RobLogManager {
             this.endDate = LocalDate.now();
         }
 
-        if (fromDate != null && fromDate.length() > 0) {
+        if (fromDate != null && fromDate.length() > 0 && !fromDate.equals(toDate)) {
             this.startDate = LocalDate.parse(fromDate, DateTimeFormatter.ISO_LOCAL_DATE);
         } else {
             this.startDate = this.endDate.minusDays(14l);
