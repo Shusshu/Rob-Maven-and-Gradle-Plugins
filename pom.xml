@@ -79,6 +79,7 @@
 				<module>rob-lib</module>
                 <module>rob-cli</module>
                 <module>rob-maven-plugin</module>
+                <module>rob-gui-shared</module>
                 <module>rob-swt</module>
                 <module>rob-javafx</module>
 			</modules>

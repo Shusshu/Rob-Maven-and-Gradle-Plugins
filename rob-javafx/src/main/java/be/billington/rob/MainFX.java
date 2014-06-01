@@ -7,6 +7,7 @@ import ch.qos.logback.core.ConsoleAppender;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -122,14 +123,13 @@ public class MainFX extends Application {
 
     private void initUILogger(LoggerContext context) {
         ConsoleAppender consoleAppender = new ConsoleAppender<>();
-        UIAppender uiAppender = new UIAppender(txtConsole);
+        UIAppender uiAppender = new UIAppender((txt) ->  Platform.runLater(() -> txtConsole.appendText(txt)) );
 
         PatternLayoutEncoder pa = new PatternLayoutEncoder();
         pa.setPattern("%r %5p %c [%t] - %m%n");
         pa.setContext(context);
         pa.start();
 
-        uiAppender.setEncoder(pa);
         uiAppender.setContext(context);
         uiAppender.start();
 
@@ -138,7 +138,7 @@ public class MainFX extends Application {
         consoleAppender.start();
 
         logger.addAppender(uiAppender);
-        //logger.addAppender(consoleAppender);
+        logger.addAppender(consoleAppender);
     }
 
     private void initConfig() {

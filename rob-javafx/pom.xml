@@ -24,6 +24,12 @@
         </dependency>
 
         <dependency>
+            <groupId>be.billington.rob</groupId>
+            <artifactId>rob-gui-shared</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.7.7</version>

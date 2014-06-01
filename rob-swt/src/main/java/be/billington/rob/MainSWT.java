@@ -81,14 +81,13 @@ public class MainSWT {
 
     private void initLogger(LoggerContext context) {
         ConsoleAppender consoleAppender = new ConsoleAppender<>();
-        UIAppender uiAppender = new UIAppender(txtConsole);
+        UIAppender uiAppender = new UIAppender((txt) -> Display.getDefault().asyncExec( () -> txtConsole.append(txt) ));
 
         PatternLayoutEncoder pa = new PatternLayoutEncoder();
         pa.setPattern("%r %5p %c [%t] - %m%n");
         pa.setContext(context);
         pa.start();
 
-        uiAppender.setEncoder(pa);
         uiAppender.setContext(context);
         uiAppender.start();
 
@@ -97,7 +96,7 @@ public class MainSWT {
         consoleAppender.start();
 
         logger.addAppender(uiAppender);
-        //logger.addAppender(consoleAppender);
+        logger.addAppender(consoleAppender);
     }
 
     private void initConfig() {
