@@ -110,6 +110,23 @@ Add the following to the user gradle.properties
     githubToken=Your github token
 
 
+### Rob CLI
+
+java -jar rob-cli.jar --repo REPONAME -o OWNER -a API -f OUTPUT
+
+### Rob SWT
+
+Run rob-swt.jar and play with rob.
+
+Adding profile, switching profile, generating the report and view it directly in the UI.
+
+
+### Rob JavaFX 8
+
+Run rob-javafx and play with rob.
+
+Generating the report and view it directly in the UI.
+
 
 ## OAuth
 
