@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.*?>
+<?import javafx.collections.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
@@ -23,7 +24,14 @@
                         <Label text="Prefix" />
                         <TextField fx:id="txtPrefix" />
                         <Label text="API : " />
-                        <TextField fx:id="txtApi" />
+                        <ComboBox fx:id="comboApi">
+                            <items>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="Bitbucket" />
+                                    <String fx:value="Github" />
+                                </FXCollections>
+                            </items>
+                        </ComboBox>
                         <Label text="Branch" />
                         <TextField fx:id="txtBranch" />
                         <Label text="File Path" />

@@ -9,7 +9,8 @@ import java.io.File;
 import java.io.IOException;
 
 public class Rob {
-    public static final String API_BITBUCKET = "bitbucket";
+    public static final String API_BITBUCKET = "Bitbucket";
+    public static final String API_GITHUB = "Github";
 
     //TODO improve API with credentials
 
@@ -22,7 +23,7 @@ public class Rob {
             ConfigSections config = ConfigSections.createConfigSections(rulesFile, prefix, api);
 
             RobLogManager manager;
-            if (api.toLowerCase().equals(API_BITBUCKET)) {
+            if (api.equalsIgnoreCase(API_BITBUCKET)) {
                 manager = new RobLogBitbucketManager(logger, config, owner, repository, branch, fromDate, toDate, credentials);
             } else {
                 manager = new RobLogGithubManager(logger, config, owner, repository, fromDate, toDate, credentials);

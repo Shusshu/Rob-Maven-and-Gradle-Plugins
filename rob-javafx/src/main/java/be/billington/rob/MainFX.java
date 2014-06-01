@@ -38,7 +38,7 @@ public class MainFX extends Application {
     @FXML
     private TextField txtRepo;
     @FXML
-    private TextField txtApi;
+    private ComboBox<String> comboApi;
     @FXML
     private TextField txtPrefix;
     @FXML
@@ -236,7 +236,7 @@ public class MainFX extends Application {
 
     private void bindProfile(int pos) {
         if (profiles == null || profiles.isEmpty()) {
-            txtApi.setText("bitbucket");
+            comboApi.setValue(Rob.API_BITBUCKET);
             txtOwner.setText("afrogleap");
             txtRepo.setText("wecycle-android-recyclemanager");
             txtPrefix.setText("WEC");
@@ -245,7 +245,11 @@ public class MainFX extends Application {
         } else {
             Profile profile = profiles.get(pos);
 
-            txtApi.setText(profile.getApi());
+            if (profile.getApi().equalsIgnoreCase(Rob.API_BITBUCKET)){
+                comboApi.setValue(Rob.API_BITBUCKET);
+            } else {
+                comboApi.setValue(Rob.API_GITHUB);
+            }
             txtOwner.setText(profile.getOwner());
             txtRepo.setText(profile.getRepo());
             txtPrefix.setText(profile.getPrefix());
@@ -266,7 +270,7 @@ public class MainFX extends Application {
     }
 
     private void saveProfile() {
-        Profile profile = new Profile(txtApi.getText(), txtOwner.getText(), txtRepo.getText(),
+        Profile profile = new Profile(comboApi.getValue(), txtOwner.getText(), txtRepo.getText(),
                 txtPrefix.getText(), txtBranch.getText(), "", txtFilePath.getText(),
                 txtFromDate.getValue().toString(), txtToDate.getValue().toString());
         if (profiles == null){
@@ -296,7 +300,7 @@ public class MainFX extends Application {
         if (txtToDate != null && txtToDate.getValue() != null){
             dateToStr = txtToDate.getValue().toString();
         }
-        pool.execute( new RobRunnable(logger, txtApi.getText(), txtOwner.getText(), txtRepo.getText(),
+        pool.execute( new RobRunnable(logger, comboApi.getValue(), txtOwner.getText(), txtRepo.getText(),
                 txtPrefix.getText(), txtBranch.getText(), txtFilePath.getText(),
                 dateFromStr, dateToStr, config) );
 

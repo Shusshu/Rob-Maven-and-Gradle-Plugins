@@ -32,9 +32,9 @@ import java.util.concurrent.Executors;
 public class MainSWT {
 
     private Shell shell;
-    private Text txtOwner, txtRepo, txtApi, txtPrefix, txtBranch, txtConsole, txtFilePath, txtConfigPath;
+    private Text txtOwner, txtRepo, txtPrefix, txtBranch, txtConsole, txtFilePath, txtConfigPath;
     private DateTime dateFrom, dateTo;
-    private Combo profilesCombo;
+    private Combo comboApi, profilesCombo;
     private Logger logger;
     private File configFile, profileFile;
     private List<Profile> profiles;
@@ -223,8 +223,8 @@ public class MainSWT {
         lblApi.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
         lblApi.setText("API:");
 
-        txtApi = new Text(container, SWT.BORDER);
-        txtApi.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        comboApi = new Combo(container, SWT.PUSH);
+        comboApi.setItems(new String[]{Rob.API_BITBUCKET, Rob.API_GITHUB});
 
         Label lblPrefix = new Label(container, SWT.NONE);
         lblPrefix.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -386,7 +386,7 @@ public class MainSWT {
 
     private void bindProfile(int pos) {
         if (profiles == null || profiles.isEmpty()) {
-            txtApi.setText("bitbucket");
+            comboApi.select(0);
             txtOwner.setText("afrogleap");
             txtRepo.setText("wecycle-android-recyclemanager");
             txtPrefix.setText("WEC");
@@ -396,7 +396,11 @@ public class MainSWT {
         } else {
             Profile profile = profiles.get(pos);
 
-            txtApi.setText(profile.getApi());
+            if (profile.getApi().equalsIgnoreCase(Rob.API_BITBUCKET)){
+                comboApi.select(0);
+            } else {
+                comboApi.select(1);
+            }
             txtOwner.setText(profile.getOwner());
             txtRepo.setText(profile.getRepo());
             txtPrefix.setText(profile.getPrefix());
@@ -423,7 +427,7 @@ public class MainSWT {
         String dateFromStr = LocalDate.of(dateFrom.getYear(), dateFrom.getMonth() + 1, dateFrom.getDay()).toString();
         String dateToStr = LocalDate.of(dateTo.getYear(), dateTo.getMonth() + 1, dateTo.getDay()).toString();
 
-        Profile profile = new Profile(txtApi.getText(), txtOwner.getText(), txtRepo.getText(),
+        Profile profile = new Profile(comboApi.getText(), txtOwner.getText(), txtRepo.getText(),
                 txtPrefix.getText(), txtBranch.getText(), "", txtFilePath.getText(),
                 dateFromStr, dateToStr);
         if (profiles == null){
@@ -448,7 +452,7 @@ public class MainSWT {
         String dateFromStr = LocalDate.of(dateFrom.getYear(), dateFrom.getMonth() + 1, dateFrom.getDay()).toString();
         String dateToStr = LocalDate.of(dateTo.getYear(), dateTo.getMonth() + 1, dateTo.getDay()).toString();
 
-        pool.execute( new RobRunnable(logger, txtApi.getText(), txtOwner.getText(), txtRepo.getText(),
+        pool.execute( new RobRunnable(logger, comboApi.getText(), txtOwner.getText(), txtRepo.getText(),
                 txtPrefix.getText(), txtBranch.getText(), txtFilePath.getText(),
                 dateFromStr, dateToStr, config) );
 

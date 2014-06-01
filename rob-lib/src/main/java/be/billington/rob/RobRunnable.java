@@ -38,7 +38,7 @@ public class RobRunnable implements Runnable {
 
         try {
             Credentials credentials;
-            if (api.toLowerCase().equals(Rob.API_BITBUCKET)){
+            if (api.equalsIgnoreCase(Rob.API_BITBUCKET)){
                 credentials = new BitbucketCredentials(config.get(CONFIG_KEY), config.get(CONFIG_SECRET));
             } else {
                 credentials = new GithubCredentials(config.get(CONFIG_TOKEN));

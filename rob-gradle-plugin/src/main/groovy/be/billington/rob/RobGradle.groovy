@@ -45,7 +45,7 @@ class RobGradle implements Plugin<Project> {
 
         try {
             Credentials credentials;
-            if (api.toLowerCase().equals(Rob.API_BITBUCKET)){
+            if (api.equalsIgnoreCase(Rob.API_BITBUCKET)){
                 credentials = new BitbucketCredentials(project.bitbucketKey, project.bitbucketSecret);
             } else {
                 credentials = new GithubCredentials(project.githubToken);

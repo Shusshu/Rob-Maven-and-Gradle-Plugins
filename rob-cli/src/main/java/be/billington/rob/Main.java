@@ -35,7 +35,7 @@ public class Main {
             initParams(cmd);
 
             Credentials credentials;
-            if (api.toLowerCase().equals(Rob.API_BITBUCKET)){
+            if (api.equalsIgnoreCase(Rob.API_BITBUCKET)){
                 credentials = new BitbucketCredentials(key, secret);
             } else {
                 credentials = new GithubCredentials(token);
