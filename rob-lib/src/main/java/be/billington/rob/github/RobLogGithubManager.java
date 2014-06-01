@@ -2,7 +2,6 @@ package be.billington.rob.github;
 
 import be.billington.rob.Commit;
 import be.billington.rob.ConfigSections;
-import be.billington.rob.Credentials;
 import be.billington.rob.RobLogManager;
 import org.slf4j.Logger;
 import retrofit.RestAdapter;
@@ -12,13 +11,13 @@ import java.util.List;
 
 public class RobLogGithubManager extends RobLogManager {
 
-    private final Credentials credentials;
+    private final String token;
     private final String owner;
     private final String repository;
 
-    public RobLogGithubManager(Logger log, ConfigSections config, String owner, String repository, String fromDate, String toDate, Credentials credentials) {
+    public RobLogGithubManager(Logger log, ConfigSections config, String owner, String repository, String fromDate, String toDate, String token) {
         super(log, config, fromDate, toDate);
-        this.credentials = credentials;
+        this.token = token;
         this.owner = owner;
         this.repository = repository;
     }
@@ -34,8 +33,8 @@ public class RobLogGithubManager extends RobLogManager {
 
         String auth = "";
 
-        if (credentials.getToken() != null && !credentials.getToken().isEmpty()) {
-            auth = "Bearer " + credentials.getToken();
+        if (token != null && !token.isEmpty()) {
+            auth = "Bearer " + token;
         }
 
         if (page == 0) {

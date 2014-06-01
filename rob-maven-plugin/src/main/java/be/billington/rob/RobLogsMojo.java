@@ -1,8 +1,6 @@
 package be.billington.rob;
 
 
-import be.billington.rob.bitbucket.BitbucketCredentials;
-import be.billington.rob.github.GithubCredentials;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
@@ -77,13 +75,11 @@ public class RobLogsMojo extends AbstractMojo
         getLog().info( "Robbing..." );
 
         try {
-            Credentials credentials;
-            if (api.equalsIgnoreCase(Rob.API_BITBUCKET)){
-                credentials = new BitbucketCredentials(key, secret);
-            } else {
-                credentials = new GithubCredentials(token);
-            }
-            Rob.logs(StaticLoggerBinder.getSingleton().getLoggerFactory().getLogger(""), api, owner, repository, prefix, branch, rulesFile, filePath, startDateStr, endDateStr, credentials);
+            Configuration conf = new Configuration.ConfigurationBuilder(StaticLoggerBinder.getSingleton().getLoggerFactory().getLogger(""), api, repository, owner)
+                    .branch(branch).prefix(prefix).filePath(filePath).fromDate(startDateStr).toDate(endDateStr)
+                    .token(token).key(key).secret(secret).build();
+
+            Rob.logs(conf);
 
         } catch (Exception e) {
             getLog().error( "Error: " + e.getMessage(), e);

@@ -2,7 +2,6 @@ package be.billington.rob.bitbucket;
 
 import be.billington.rob.Commit;
 import be.billington.rob.ConfigSections;
-import be.billington.rob.Credentials;
 import be.billington.rob.RobLogManager;
 import org.slf4j.Logger;
 import retrofit.RestAdapter;
@@ -13,16 +12,18 @@ import java.util.List;
 
 public class RobLogBitbucketManager extends RobLogManager {
 
-    private final Credentials credentials;
+    private final String key;
+    private final String secret;
     private final String owner;
     private final String repository;
     private final String branch;
 
     private BitbucketResponse resp;
 
-    public RobLogBitbucketManager(Logger log, ConfigSections config, String owner, String repository, String branch, String fromDate, String toDate, Credentials credentials) {
+    public RobLogBitbucketManager(Logger log, ConfigSections config, String owner, String repository, String branch, String fromDate, String toDate, String key, String secret) {
         super(log, config, fromDate, toDate);
-        this.credentials = credentials;
+        this.key = key;
+        this.secret = secret;
         this.owner = owner;
         this.repository = repository;
         this.branch = branch;
@@ -30,7 +31,7 @@ public class RobLogBitbucketManager extends RobLogManager {
 
     @Override
     protected List<? extends Commit> fetchFromApi(int page){
-        RetrofitHttpOAuthConsumer oAuthConsumer = new RetrofitHttpOAuthConsumer(credentials.getKey(), credentials.getSecret());
+        RetrofitHttpOAuthConsumer oAuthConsumer = new RetrofitHttpOAuthConsumer(key, secret);
         //oAuthConsumer.setTokenWithSecret(token, secret);
 
         RestAdapter restAdapter = new RestAdapter.Builder()

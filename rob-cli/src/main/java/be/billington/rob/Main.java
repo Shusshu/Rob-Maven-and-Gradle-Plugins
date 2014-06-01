@@ -1,7 +1,5 @@
 package be.billington.rob;
 
-import be.billington.rob.bitbucket.BitbucketCredentials;
-import be.billington.rob.github.GithubCredentials;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,13 +32,11 @@ public class Main {
 
             initParams(cmd);
 
-            Credentials credentials;
-            if (api.equalsIgnoreCase(Rob.API_BITBUCKET)){
-                credentials = new BitbucketCredentials(key, secret);
-            } else {
-                credentials = new GithubCredentials(token);
-            }
-            Rob.logs(logger, api, owner, repo, prefix, branch, rulesFile, filePath, fromDate, toDate, credentials);
+            Configuration conf = new Configuration.ConfigurationBuilder(logger, api, repo, owner)
+                    .branch(branch).prefix(prefix).filePath(filePath).fromDate(fromDate).toDate(toDate)
+                    .token(token).key(key).secret(secret).configPath(rulesFile).build();
+
+            Rob.logs(conf);
 
         } catch (ParseException e) {
             logger.error("ParseException: " + e.getMessage(), e);

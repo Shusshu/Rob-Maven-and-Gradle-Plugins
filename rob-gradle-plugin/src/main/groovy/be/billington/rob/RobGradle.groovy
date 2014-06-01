@@ -7,6 +7,8 @@ import be.billington.rob.bitbucket.BitbucketCredentials
 import be.billington.rob.github.GithubCredentials
 import be.billington.rob.Credentials
 
+import javax.security.auth.login.Configuration
+
 
 class RobGradle implements Plugin<Project> {
     void apply(Project project) {
@@ -44,13 +46,11 @@ class RobGradle implements Plugin<Project> {
         project.logger.info( "Robbing..." );
 
         try {
-            Credentials credentials;
-            if (api.equalsIgnoreCase(Rob.API_BITBUCKET)){
-                credentials = new BitbucketCredentials(project.bitbucketKey, project.bitbucketSecret);
-            } else {
-                credentials = new GithubCredentials(project.githubToken);
-            }
-            Rob.logs(project.logger, api, project.robOwner, project.robRepository, prefix, branch, "", project.robFile, startDateStr, endDateStr, credentials);
+            Configuration conf = new Configuration.ConfigurationBuilder(logger, api, project.robRepository, project.robOwner)
+                    .branch(branch).prefix(prefix).filePath(project.robFile).fromDate(startDateStr).toDate(endDateStr)
+                    .token(project.githubToken).key(project.bitbucketKey).secret(project.bitbucketSecret).build();
+
+            Rob.logs(conf);
 
         } catch (Exception e) {
             project.logger.error( "Error: " + e.getMessage(), e);

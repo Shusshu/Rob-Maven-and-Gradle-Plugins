@@ -12,40 +12,37 @@ public class Rob {
     public static final String API_BITBUCKET = "Bitbucket";
     public static final String API_GITHUB = "Github";
 
-    //TODO improve API with credentials
-
-    public static void logs(Logger logger, String api, String owner, String repository, String prefix, String branch, String rulesFile, String filePath, String fromDate, String toDate, Credentials credentials) {
-        logs(logger, api, owner, repository, prefix, branch, rulesFile, filePath, fromDate, toDate, credentials, null);
-    }
-
-    public static void logs(Logger logger, String api, String owner, String repository, String prefix, String branch, String rulesFile, String filePath, String fromDate, String toDate, Credentials credentials, File targetDirectory) {
+    public static void logs(Configuration conf) {
         try {
-            ConfigSections config = ConfigSections.createConfigSections(rulesFile, prefix, api);
+
+            ConfigSections config = ConfigSections.createConfigSections(conf.getConfigPath(), conf.getPrefix(), conf.getApi());
 
             RobLogManager manager;
-            if (api.equalsIgnoreCase(API_BITBUCKET)) {
-                manager = new RobLogBitbucketManager(logger, config, owner, repository, branch, fromDate, toDate, credentials);
+            if (conf.getApi().equalsIgnoreCase(API_BITBUCKET)) {
+                manager = new RobLogBitbucketManager(conf.getLogger(), config, conf.getOwner(), conf.getRepo(),
+                        conf.getBranch(), conf.getFromDate(), conf.getToDate(), conf.getKey(), conf.getSecret());
             } else {
-                manager = new RobLogGithubManager(logger, config, owner, repository, fromDate, toDate, credentials);
+                manager = new RobLogGithubManager(conf.getLogger(), config, conf.getOwner(), conf.getRepo(),
+                        conf.getFromDate(), conf.getToDate(), conf.getToken());
             }
 
             manager.fetchAndProcessCommitMessages();
 
-            manager.generateFile(targetDirectory, filePath);
+            manager.generateFile(conf.getOutputDir(), conf.getFilePath());
 
         } catch (RetrofitError e) {
 
-            logger.error("Network Error: " + e.getMessage() + " - " + e.getResponse().getStatus() + " - URL: " + e.getUrl(), e);
+            conf.getLogger().error("Network Error: " + e.getMessage() + " - " + e.getResponse().getStatus() + " - URL: " + e.getUrl(), e);
 
             if (e.getResponse() != null){
                 switch (e.getResponse().getStatus()) {
-                    case 401: logger.error("Unauthorized - Check your credentials"); break;
+                    case 401: conf.getLogger().error("Unauthorized - Check your credentials"); break;
                     default: break;
                 }
             }
 
         } catch (IOException ioex) {
-            logger.error("File Error: " + ioex.getMessage(), ioex);
+            conf.getLogger().error("File Error: " + ioex.getMessage(), ioex);
         }
     }
 }

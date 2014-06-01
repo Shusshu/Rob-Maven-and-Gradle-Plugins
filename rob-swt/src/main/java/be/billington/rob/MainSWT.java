@@ -452,9 +452,11 @@ public class MainSWT {
         String dateFromStr = LocalDate.of(dateFrom.getYear(), dateFrom.getMonth() + 1, dateFrom.getDay()).toString();
         String dateToStr = LocalDate.of(dateTo.getYear(), dateTo.getMonth() + 1, dateTo.getDay()).toString();
 
-        pool.execute( new RobRunnable(logger, comboApi.getText(), txtOwner.getText(), txtRepo.getText(),
-                txtPrefix.getText(), txtBranch.getText(), txtFilePath.getText(),
-                dateFromStr, dateToStr, config) );
+        Configuration conf = new Configuration.ConfigurationBuilder(logger, comboApi.getText(), txtRepo.getText(), txtOwner.getText())
+                .branch(txtBranch.getText()).prefix(txtPrefix.getText()).filePath(txtFilePath.getText()).fromDate(dateFromStr).toDate(dateToStr)
+                .token(config.get(Common.CONFIG_TOKEN)).key(config.get(Common.CONFIG_KEY)).secret(config.get(Common.CONFIG_SECRET)).configPath(txtConfigPath.getText()).build();
+
+        pool.execute( new RobWorker(conf) );
 
     }
 

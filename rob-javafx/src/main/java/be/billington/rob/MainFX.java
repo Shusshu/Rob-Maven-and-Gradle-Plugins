@@ -48,6 +48,8 @@ public class MainFX extends Application {
     @FXML
     private TextField txtFilePath;
     @FXML
+    private TextField txtConfigPath;
+    @FXML
     private DatePicker txtFromDate;
     @FXML
     private DatePicker txtToDate;
@@ -300,9 +302,11 @@ public class MainFX extends Application {
         if (txtToDate != null && txtToDate.getValue() != null){
             dateToStr = txtToDate.getValue().toString();
         }
-        pool.execute( new RobRunnable(logger, comboApi.getValue(), txtOwner.getText(), txtRepo.getText(),
-                txtPrefix.getText(), txtBranch.getText(), txtFilePath.getText(),
-                dateFromStr, dateToStr, config) );
+        Configuration conf = new Configuration.ConfigurationBuilder(logger, comboApi.getValue(), txtRepo.getText(), txtOwner.getText())
+                .branch(txtBranch.getText()).prefix(txtPrefix.getText()).filePath(txtFilePath.getText()).fromDate(dateFromStr).toDate(dateToStr)
+                .token(config.get(Common.CONFIG_TOKEN)).key(config.get(Common.CONFIG_KEY)).secret(config.get(Common.CONFIG_SECRET)).configPath(txtConfigPath.getText()).build();
+
+        pool.execute( new RobWorker(conf) );
 
     }
 
