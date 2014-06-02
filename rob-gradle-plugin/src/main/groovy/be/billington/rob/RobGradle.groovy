@@ -3,10 +3,6 @@ package be.billington.rob
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
-import be.billington.rob.bitbucket.BitbucketCredentials
-import be.billington.rob.github.GithubCredentials
-import be.billington.rob.Credentials
-
 import javax.security.auth.login.Configuration
 
 
