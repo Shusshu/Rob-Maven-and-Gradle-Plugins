@@ -77,7 +77,7 @@ public class RobLogsMojo extends AbstractMojo
         try {
             Configuration conf = new Configuration.ConfigurationBuilder(StaticLoggerBinder.getSingleton().getLoggerFactory().getLogger(""), api, repository, owner)
                     .branch(branch).prefix(prefix).filePath(filePath).fromDate(startDateStr).toDate(endDateStr)
-                    .token(token).key(key).secret(secret).build();
+                    .token(token).key(key).secret(secret).outputDir(targetDirectory).build();
 
             Rob.logs(conf);
 
