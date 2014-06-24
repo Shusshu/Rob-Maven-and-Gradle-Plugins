@@ -2,8 +2,8 @@ package be.billington.rob.github;
 
 import be.billington.rob.Commit;
 import be.billington.rob.ConfigSections;
+import be.billington.rob.Configuration;
 import be.billington.rob.RobLogManager;
-import org.slf4j.Logger;
 import retrofit.RestAdapter;
 
 import java.time.format.DateTimeFormatter;
@@ -15,11 +15,11 @@ public class RobLogGithubManager extends RobLogManager {
     private final String owner;
     private final String repository;
 
-    public RobLogGithubManager(Logger log, ConfigSections config, String owner, String repository, String fromDate, String toDate, String token) {
-        super(log, config, fromDate, toDate);
-        this.token = token;
-        this.owner = owner;
-        this.repository = repository;
+    public RobLogGithubManager(Configuration conf, ConfigSections config) {
+        super(conf.getLogger(), config, conf.getFromDate(), conf.getToDate());
+        this.token = conf.getToken();
+        this.owner = conf.getOwner();
+        this.repository = conf.getRepo();
     }
 
     @Override

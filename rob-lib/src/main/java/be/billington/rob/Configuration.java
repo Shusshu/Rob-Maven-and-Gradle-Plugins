@@ -8,6 +8,8 @@ public class Configuration extends Profile {
 
     private final String key;
     private final String secret;
+    private final String username;
+    private final String password;
     private final String token;
     private final Logger logger;
     private final File outputDir;
@@ -17,6 +19,8 @@ public class Configuration extends Profile {
                 builder.configPath, builder.filePath, builder.fromDate, builder.toDate);
         this.key = builder.key;
         this.secret = builder.secret;
+        this.username = builder.username;
+        this.password = builder.password;
         this.token = builder.token;
         this.logger = builder.logger;
         this.outputDir = builder.outputDir;
@@ -28,6 +32,14 @@ public class Configuration extends Profile {
 
     public String getSecret() {
         return secret;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     public String getToken() {
@@ -42,6 +54,18 @@ public class Configuration extends Profile {
         return outputDir;
     }
 
+    public boolean hasKeySecret() {
+        return key != null && key.length() > 0 && secret != null && secret.length() > 0;
+    }
+
+    public boolean hasUsernamePassword() {
+        return username != null && username.length() > 0 && password != null && password.length() > 0;
+    }
+
+    public boolean hasToken() {
+        return token != null && token.length() > 0;
+    }
+
     public static class ConfigurationBuilder implements Builder<Configuration> {
         private String api;
         private String owner;
@@ -54,6 +78,8 @@ public class Configuration extends Profile {
         private String toDate;
         private String key;
         private String secret;
+        private String username;
+        private String password;
         private String token;
         private Logger logger;
         private File outputDir;
@@ -102,6 +128,16 @@ public class Configuration extends Profile {
 
         public ConfigurationBuilder secret(String secret) {
             this.secret = secret;
+            return this;
+        }
+
+        public ConfigurationBuilder username(String username) {
+            this.username = username;
+            return this;
+        }
+
+        public ConfigurationBuilder password(String password) {
+            this.password = password;
             return this;
         }
 

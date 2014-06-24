@@ -56,6 +56,12 @@ public class RobLogsMojo extends AbstractMojo
     @Parameter(property = "rob.github.token")
     private String token;
 
+    @Parameter(property = "rob.bitbucket.username")
+    private String username;
+
+    @Parameter(property = "rob.bitbucket.password")
+    private String password;
+
     @Parameter(property = "rob.failOnError", defaultValue = "true")
     private boolean failOnError = false;
 
@@ -77,7 +83,7 @@ public class RobLogsMojo extends AbstractMojo
         try {
             Configuration conf = new Configuration.ConfigurationBuilder(StaticLoggerBinder.getSingleton().getLoggerFactory().getLogger(""), api, repository, owner)
                     .branch(branch).prefix(prefix).filePath(filePath).fromDate(startDateStr).toDate(endDateStr)
-                    .token(token).key(key).secret(secret).outputDir(targetDirectory).build();
+                    .token(token).key(key).secret(secret).username(username).password((password)).outputDir(targetDirectory).build();
 
             Rob.logs(conf);
 

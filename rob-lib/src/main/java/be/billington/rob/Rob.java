@@ -19,11 +19,9 @@ public class Rob {
 
             RobLogManager manager;
             if (conf.getApi().equalsIgnoreCase(API_BITBUCKET)) {
-                manager = new RobLogBitbucketManager(conf.getLogger(), config, conf.getOwner(), conf.getRepo(),
-                        conf.getBranch(), conf.getFromDate(), conf.getToDate(), conf.getKey(), conf.getSecret());
+                manager = new RobLogBitbucketManager(conf, config);
             } else {
-                manager = new RobLogGithubManager(conf.getLogger(), config, conf.getOwner(), conf.getRepo(),
-                        conf.getFromDate(), conf.getToDate(), conf.getToken());
+                manager = new RobLogGithubManager(conf, config);
             }
 
             manager.fetchAndProcessCommitMessages();

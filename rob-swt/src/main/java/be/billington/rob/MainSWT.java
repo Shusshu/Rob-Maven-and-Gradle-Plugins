@@ -454,7 +454,9 @@ public class MainSWT {
 
         Configuration conf = new Configuration.ConfigurationBuilder(logger, comboApi.getText(), txtRepo.getText(), txtOwner.getText())
                 .branch(txtBranch.getText()).prefix(txtPrefix.getText()).filePath(txtFilePath.getText()).fromDate(dateFromStr).toDate(dateToStr)
-                .token(config.get(Common.CONFIG_TOKEN)).key(config.get(Common.CONFIG_KEY)).secret(config.get(Common.CONFIG_SECRET)).configPath(txtConfigPath.getText()).build();
+                .token(config.get(Common.CONFIG_TOKEN)).key(config.get(Common.CONFIG_KEY)).secret(config.get(Common.CONFIG_SECRET))
+                .username(config.get(Common.CONFIG_USERNAME)).password(config.get(Common.CONFIG_PASSWORD))
+                .configPath(txtConfigPath.getText()).build();
 
         pool.execute( new RobWorker(conf) );
 
