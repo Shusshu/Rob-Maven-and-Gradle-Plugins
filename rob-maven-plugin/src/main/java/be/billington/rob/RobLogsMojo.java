@@ -7,6 +7,7 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.slf4j.impl.StaticLoggerBinder;
+import org.sonatype.plexus.components.cipher.PlexusCipher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 
@@ -69,9 +70,9 @@ public class RobLogsMojo extends AbstractMojo
     protected File targetDirectory;
 
     /**
-     * @since 1.1.0
+     * @since 3.3.0
      */
-    @Component
+    @Component( role = org.sonatype.plexus.components.sec.dispatcher.SecDispatcher.class, hint = "default" )
     private SecDispatcher securityDispatcher;
 
     public void execute() throws MojoExecutionException
@@ -83,7 +84,7 @@ public class RobLogsMojo extends AbstractMojo
         try {
             Configuration conf = new Configuration.ConfigurationBuilder(StaticLoggerBinder.getSingleton().getLoggerFactory().getLogger(""), api, repository, owner)
                     .branch(branch).prefix(prefix).filePath(filePath).fromDate(startDateStr).toDate(endDateStr)
-                    .token(token).key(key).secret(secret).username(username).password((password)).outputDir(targetDirectory).build();
+                    .token(token).key(key).secret(secret).username(username).password(decrypt(password)).outputDir(targetDirectory).build();
 
             Rob.logs(conf);
 
