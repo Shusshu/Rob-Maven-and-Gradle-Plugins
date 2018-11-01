@@ -47,7 +47,7 @@ Add this to your pom.xml
                 <plugin>
                     <groupId>be.billington</groupId>
                     <artifactId>rob-maven-plugin</artifactId>
-                    <version>2.3.0</version>
+                    <version>3.4.0</version>
                     <executions>
                         <execution>
                             <phase>generate-resources</phase>
@@ -86,7 +86,7 @@ Add the following to the build.gradle
         mavenCentral()
       }
       dependencies {
-        classpath 'be.billington.rob:rob-gradle-plugin:3.0.0'
+        classpath 'be.billington.rob:rob-gradle-plugin:3.4.0'
       }
     }
 
