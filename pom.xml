@@ -36,8 +36,8 @@
 
     <repositories>
         <repository>
-            <id>com.afrogleap.repo.afl.group</id>
-            <url>http://nxs.pm.afrogleap.com/nexus/content/groups/afl</url>
+            <id>jitpack</id>
+            <url>https://jitpack.io</url>
         </repository>
     </repositories>
 
